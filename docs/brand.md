@@ -1,10 +1,23 @@
 # DAYFOUR — Brand & Website Design System
 
-> **Intro update (September 2026):** The intro no longer morphs the logo into a hero still with rain.
-> New sequence: the 3D logo plays and changes angle → the camera zooms out to reveal the logo is a
-> frame inside an editing app → the camera moves down onto the editing timeline → the timeline footage
-> (fast and slow versions) becomes the hero, with the DɅYFOVR wordmark over it.
-> The motion sections below that mention rain and the logo-to-image morph are superseded by this.
+> **Intro update (September 2026):** The site opens with a seven-act sequence that replaces the
+> older intro, hero-with-rain and logo-to-image morph described further down.
+>
+> 1. **Logo emerges (4-6s).** Pure black. Silence. The dark 3D mark reveals itself only through light
+>    catching its surfaces. Nothing moves.
+> 2. **Logo rotates into the editing frame (3-4s).** It turns from upright and centered to a dramatic
+>    diagonal, settling inside a dark editing interface with a thin toolbar at the top. Still silence.
+> 3. **Camera descends to the timeline (3-4s).** The logo fades as the camera drops below it. The
+>    loaded timeline (red clips, teal tracks, white waveforms) rises from below and settles at its
+>    diagonal angle. The ethereal sound begins, soft.
+> 4. **Timeline holds and breathes (2-3s).** Tracks move slowly as if the playhead is advancing. Sound
+>    at full presence. DɅYFOVR fades in small over the timeline.
+> 5. **Scroll: tension builds.** DɅYFOVR scales up with the scroll. The timeline accelerates. The sound
+>    accelerates with it.
+> 6. **The drop.** Wordmark large and dominant, tracks near motion blur. The image falls out of frame
+>    like a hard film cut. Sound cuts at the same moment.
+> 7. **About arrives.** Pure black, complete silence. *Not everything we make is seen. / Not everyone is
+>    meant to see it.* Each line fades in half a second after the last. Nothing else moves.
 
 ---
 
