@@ -1,0 +1,315 @@
+:root {
+  --df-black: #000000;
+  --df-white: #ffffff;
+  --df-grey-dim: #1a1a1a;
+  --df-grey-mid: #3d3d3d;
+  --df-grey-light: #8a8a8a;
+  --serif: "Cormorant Garamond", "Cormorant", Garamond, "Times New Roman", serif;
+  --sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--df-black);
+  color: var(--df-white);
+}
+
+body {
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+html.locked, html.locked body { overflow: hidden; }
+
+/* ---------- Intro stage ---------- */
+
+.stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--df-black);
+  perspective: 1600px;
+  perspective-origin: 50% 50%;
+  z-index: 0;
+}
+
+/* The editor lives in a fixed 1600-unit world; main.js moves a camera over it. */
+.world {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1600px;
+  height: 1500px;
+  transform-origin: 0 0;
+  will-change: transform;
+  font-family: var(--sans);
+  color: #6f6f6f;
+}
+
+.chrome { opacity: 0; }
+
+.ed-bar {
+  position: absolute;
+  left: 0; top: 0;
+  width: 1600px; height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding-inline: 16px;
+  border-bottom: 1px solid #141414;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+.ed-dots { display: flex; gap: 7px; }
+.ed-dots i { width: 10px; height: 10px; border-radius: 50%; background: #2a2a2a; }
+.ed-seq { margin-left: auto; color: #555; }
+
+.ed-bin {
+  position: absolute;
+  left: 16px; top: 64px;
+  width: 128px;
+  font-size: 11px;
+  line-height: 2.2;
+  color: #4a4a4a;
+}
+.ed-bin p { margin: 0; white-space: nowrap; }
+.ed-bin p:first-child { color: #777; }
+
+.viewer {
+  position: absolute;
+  left: 160px; top: 60px;
+  width: 1280px; height: 720px;
+  background: var(--df-black);
+  overflow: hidden;
+}
+.viewer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid #161616;
+  opacity: var(--frame, 0);
+  pointer-events: none;
+}
+.shot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+}
+
+.ed-thumbs {
+  position: absolute;
+  left: 1470px; top: 250px;
+  width: 110px;
+  display: grid;
+  gap: 12px;
+}
+.ed-thumbs img {
+  width: 110px;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  opacity: 0.35;
+  outline: 1px solid #222;
+}
+.ed-thumbs img.on { opacity: 0.9; outline-color: #777; }
+
+.ed-transport {
+  position: absolute;
+  left: 160px; top: 790px;
+  width: 1280px; height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.ed-transport .ctl { color: #8a8a8a; letter-spacing: 0.1em; }
+
+.timeline {
+  position: absolute;
+  left: 0; top: 850px;
+  width: 1600px; height: 650px;
+}
+
+.playhead {
+  position: absolute;
+  top: 850px;
+  left: 0;
+  width: 2px;
+  height: 650px;
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateX(var(--x, 620px));
+}
+.playhead::before {
+  content: "";
+  position: absolute;
+  top: 0; left: -6px;
+  width: 14px; height: 14px;
+  background: var(--df-white);
+}
+
+/* Full-bleed timeline footage the camera move lands on. */
+.footage {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.footage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: 60% 40%;
+  filter: brightness(0.72);
+}
+
+/* ---------- Page ---------- */
+
+main { position: relative; z-index: 1; }
+
+.wordmark {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  line-height: 1;
+  white-space: nowrap;
+}
+/* The Ʌ in the wordmark is a V turned upside down, so it matches the face exactly. */
+.wordmark .inv {
+  display: inline-block;
+  transform: scaleY(-1);
+  transform-origin: 50% 50.5%;
+}
+
+.hero {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 20px;
+  padding-inline: 16px;
+  text-align: center;
+  pointer-events: none;
+}
+.hero .wordmark {
+  font-size: clamp(44px, 11vw, 96px);
+  margin-right: -0.15em; /* balance trailing tracking */
+  opacity: 0;
+  will-change: transform;
+}
+.hero-line {
+  margin: 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(17px, 2.4vw, 22px);
+  letter-spacing: 0.04em;
+  opacity: 0;
+}
+.scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+  width: 1px;
+  height: 44px;
+  background: linear-gradient(var(--df-white), transparent);
+  opacity: 0;
+}
+
+.statement {
+  position: relative;
+  background: var(--df-black);
+  padding: 22vh 16px 18vh;
+  display: grid;
+  justify-items: center;
+  gap: 16vh;
+  text-align: center;
+}
+.block { display: grid; gap: 14px; max-width: 34ch; }
+.statement p, .statement h2 { margin: 0; }
+.statement p {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(22px, 3.4vw, 34px);
+  line-height: 1.35;
+  letter-spacing: 0.03em;
+  text-wrap: balance;
+}
+.statement h2 {
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--df-grey-light);
+  margin-bottom: 10px;
+}
+.statement .disciplines {
+  font-size: clamp(18px, 2.2vw, 22px);
+  letter-spacing: 0.15em;
+  color: var(--df-grey-light);
+}
+
+.js-reveal .line {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 1.2s ease, transform 1.2s ease;
+}
+.js-reveal .line.in { opacity: 1; transform: none; }
+
+.footer {
+  position: relative;
+  background: var(--df-black);
+  padding: 14vh 16px calc(12vh + env(safe-area-inset-bottom, 0px));
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  text-align: center;
+  color: var(--df-grey-light);
+}
+.footer p { margin: 0; }
+.footer .wordmark.small {
+  font-size: 30px;
+  color: var(--df-white);
+  margin-bottom: 22px;
+  margin-right: -0.15em;
+}
+.footer .appt {
+  margin-top: 22px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--df-white);
+}
+
+/* Review helper; remove before launch. */
+.replay {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 5;
+  background: none;
+  border: 0;
+  padding: 6px 0;
+  font: 300 11px/1 var(--sans);
+  letter-spacing: 0.08em;
+  color: var(--df-grey-light);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+.replay.show { opacity: 1; }
+.replay:focus-visible { outline: 1px solid var(--df-white); outline-offset: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .js-reveal .line { transition: none; opacity: 1; transform: none; }
+}

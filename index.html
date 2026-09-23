@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DAYFOUR</title>
+<meta name="description" content="DAYFOUR. Film. Commercial. Documentary.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Intro: logo -> zoom out into the editor -> camera drops to the timeline -> footage -->
+<div class="stage" aria-hidden="true">
+  <div class="world">
+    <div class="ed-bar">
+      <span class="ed-dots"><i></i><i></i><i></i></span>
+      <span class="ed-menu">File&nbsp;&nbsp;Edit&nbsp;&nbsp;Clip&nbsp;&nbsp;Sequence&nbsp;&nbsp;Marker&nbsp;&nbsp;Window</span>
+      <span class="ed-seq">DAYFOUR_intro_v4</span>
+    </div>
+
+    <div class="ed-bin">
+      <p>Project</p>
+      <p>logo_angle_v4</p>
+      <p>timeline_fast</p>
+      <p>timeline_slow</p>
+      <p>kidsuper_nyfw</p>
+      <p>grade_bw</p>
+    </div>
+
+    <div class="viewer">
+      <img class="shot logo-front" src="assets/img/logo-front.jpg" alt="">
+      <img class="shot logo-angle" src="assets/img/logo-angle.jpg" alt="">
+    </div>
+
+    <div class="ed-thumbs">
+      <img src="assets/img/logo-front.jpg" alt="">
+      <img class="on" src="assets/img/logo-angle.jpg" alt="">
+      <img src="assets/img/timeline.jpg" alt="">
+    </div>
+
+    <div class="ed-transport">
+      <span class="tc">00:00:15:23</span>
+      <span class="ctl">&#9666;&#9666;&nbsp;&nbsp;&nbsp;&#9666;&nbsp;&nbsp;&nbsp;&#9654;&nbsp;&nbsp;&nbsp;&#9656;&nbsp;&nbsp;&nbsp;&#9656;&#9656;</span>
+      <span class="tc">00:03:13:35</span>
+    </div>
+
+    <canvas class="timeline" width="3200" height="1300"></canvas>
+    <div class="playhead"></div>
+  </div>
+
+  <div class="footage">
+    <img src="assets/img/timeline.jpg" alt="">
+  </div>
+</div>
+
+<main>
+  <section class="hero">
+    <h1 class="wordmark" aria-label="Dayfour">D<span class="inv">V</span>YFOVR</h1>
+    <p class="hero-line">We make things that stay with you</p>
+    <span class="scroll-cue" aria-hidden="true"></span>
+  </section>
+
+  <section class="statement">
+    <div class="block">
+      <p class="line">Not everything we make is seen.</p>
+      <p class="line">Not everyone is meant to see it.</p>
+    </div>
+    <div class="block">
+      <h2 class="line">What we believe</h2>
+      <p class="line">We believe in restraint.</p>
+      <p class="line">We believe mystery is not a strategy, it is a standard.</p>
+      <p class="line">We believe the work speaks and the studio stays quiet.</p>
+    </div>
+    <div class="block">
+      <h2 class="line">Who we work with</h2>
+      <p class="line">Creatives. Brands. People with a vision who need someone who can see it too.</p>
+      <p class="line">Not everyone. The right ones.</p>
+    </div>
+    <p class="line disciplines">Film. Commercial. Documentary.</p>
+  </section>
+
+  <footer class="footer">
+    <p class="wordmark small" aria-label="Dayfour">D<span class="inv">V</span>YFOVR</p>
+    <p>@dayfour.studio</p>
+    <p>@god.kagari</p>
+    <p class="appt">By appointment.</p>
+  </footer>
+</main>
+
+<button class="replay" type="button">Replay intro</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
