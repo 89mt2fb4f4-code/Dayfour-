@@ -107,19 +107,6 @@ html.locked, html.locked body { overflow: hidden; }
   object-fit: contain;
   opacity: 0;
 }
-/* Act 1: a brighter copy of the logo, visible only inside a moving band of light. */
-.logo-light {
-  filter: brightness(2.1) contrast(1.25);
-  -webkit-mask-image: linear-gradient(112deg, transparent 38%, #000 50%, transparent 62%);
-          mask-image: linear-gradient(112deg, transparent 38%, #000 50%, transparent 62%);
-  -webkit-mask-size: 300% 100%;
-          mask-size: 300% 100%;
-  -webkit-mask-repeat: no-repeat;
-          mask-repeat: no-repeat;
-  -webkit-mask-position: var(--sweep, 100%) 0;
-          mask-position: var(--sweep, 100%) 0;
-}
-
 .ed-thumbs {
   position: absolute;
   left: 1462px; top: 250px;
@@ -136,16 +123,27 @@ html.locked, html.locked body { overflow: hidden; }
 }
 .ed-thumbs img.on { opacity: 0.9; outline-color: #777; }
 
-/* Timeline footage (image now, video later), drawn to canvas for the motion blur. */
+/* Timeline footage: slow video underneath, fast frames on a canvas above it. */
 .footage {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
   opacity: 0;
   transform-origin: 50% 100%;
   will-change: transform, opacity;
 }
+.footage video,
+.footage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.footage video {
+  object-fit: cover;
+  transform: scale(1.06);
+  filter: brightness(0.72); /* keeps the white wordmark readable */
+}
+.footage canvas { opacity: 0; }
 
 .wordmark {
   margin: 0;

@@ -122,62 +122,50 @@
   ['pointerdown', 'keydown', 'touchend'].forEach((type) =>
     addEventListener(type, () => sound.unlock(), { passive: true }));
 
-  /* ---------- Timeline footage ----------
-     Drawn to canvas so it can drift along the tracks and smear into motion blur.
-     The source is the still for now; a <video> (slow / fast timeline) can replace it. */
+  /* ---------- Footage ----------
+     Logo: logo.mp4 plays once in the viewer (act 1).
+     Slow timeline: timeline-slow.mp4 (forward then reversed, so the loop has no jump).
+     Fast timeline: 96 frames drawn to canvas, frame chosen by scroll position (acts 5-6). */
 
-  const src = new Image();
-  src.src = 'assets/img/timeline.jpg';
-  const ctx2d = canvas.getContext('2d');
-  const DIR = { x: 0.98, y: 0.2 }; // direction the tracks run in the footage
-  const ZOOM = 1.3;                // headroom for the drift
-  const footage = { on: false, t0: 0, p: 0 };
+  const logoVideo = document.querySelector('.logo-video');
+  const footageEl = document.querySelector('.footage');
+  const slow = document.querySelector('.footage .slow');
+  const fastCanvas = document.querySelector('.footage .fast');
+  const fastCtx = fastCanvas.getContext('2d');
+  const FAST_COUNT = 96;
+  const fastFrames = [];
+  let lastFast = -1;
+
+  function loadFastFrames() {
+    if (fastFrames.length) return;
+    for (let i = 0; i < FAST_COUNT; i++) {
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = `assets/frames/fast/${String(i).padStart(3, '0')}.jpg`;
+      fastFrames.push(img);
+    }
+  }
 
   function sizeCanvas() {
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    canvas.width = Math.round(innerWidth * dpr);
-    canvas.height = Math.round(innerHeight * dpr);
+    fastCanvas.width = Math.round(innerWidth * dpr);
+    fastCanvas.height = Math.round(innerHeight * dpr);
+    lastFast = -1;
   }
 
-  function drawFootage(now) {
-    if (!footage.on) return;
-    requestAnimationFrame(drawFootage);
-    const iw = src.naturalWidth || src.videoWidth;
-    const ih = src.naturalHeight || src.videoHeight;
-    if (!iw) return;
-    const W = canvas.width, H = canvas.height;
-    const s = Math.max(W / iw, H / ih) * ZOOM;
-    const dw = iw * s, dh = ih * s;
-    // How far it can travel along the tracks before an edge shows.
-    const room = Math.min((dw - W) / 2 / DIR.x, (dh - H) / 2 / DIR.y) * 0.85;
-
-    // Slow breathing drift, then the scroll pushes it forward and smears it.
-    const t = (now - footage.t0) / 1000;
-    const p = footage.p;
-    const drift = room * (0.28 * Math.sin((t / 60) * Math.PI * 2) + 0.5 * Math.pow(p, 1.5));
-    const blur = reduceMotion ? 0 : W * 0.1 * p * p;
-    const x0 = (W - dw) / 2 - drift * DIR.x;
-    const y0 = (H - dh) / 2 - drift * DIR.y;
-
-    ctx2d.globalAlpha = 1;
-    ctx2d.fillStyle = '#000';
-    ctx2d.fillRect(0, 0, W, H);
-    const n = blur > 2 ? Math.min(14, Math.ceil(blur / 5)) : 1;
-    for (let i = 0; i < n; i++) {
-      const k = n === 1 ? 0 : i / (n - 1) - 0.5;
-      ctx2d.globalAlpha = 1 / (i + 1); // running average of all copies
-      ctx2d.drawImage(src, x0 - k * blur * DIR.x, y0 - k * blur * DIR.y, dw, dh);
-    }
-    ctx2d.globalAlpha = 1;
-    ctx2d.fillStyle = 'rgba(0,0,0,0.28)'; // keeps the white wordmark readable
-    ctx2d.fillRect(0, 0, W, H);
-  }
-
-  function startFootage() {
-    if (footage.on) return;
-    footage.on = true;
-    footage.t0 = performance.now();
-    requestAnimationFrame(drawFootage);
+  function drawFast(p) {
+    // Nearest frame that has loaded, so a slow connection never shows a gap.
+    let i = Math.round(p * (FAST_COUNT - 1));
+    while (i > 0 && !(fastFrames[i] && fastFrames[i].complete && fastFrames[i].naturalWidth)) i--;
+    const img = fastFrames[i];
+    if (!img || !img.naturalWidth || i === lastFast) return;
+    lastFast = i;
+    const W = fastCanvas.width, H = fastCanvas.height;
+    const s = Math.max(W / img.naturalWidth, H / img.naturalHeight) * 1.06;
+    const dw = img.naturalWidth * s, dh = img.naturalHeight * s;
+    fastCtx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
+    fastCtx.fillStyle = 'rgba(0,0,0,0.28)'; // matches the slow video's dimming
+    fastCtx.fillRect(0, 0, W, H);
   }
 
   /* ---------- Camera over the editor ---------- */
@@ -197,6 +185,7 @@
   /* ---------- Acts 1-4 (timed) ---------- */
 
   let tl;
+  let run = 0;           // bumps on replay so stale callbacks do nothing
   let scrollOpen = false;
   let dropped = false;
   let maxScale = 6;
@@ -209,17 +198,19 @@
   function reset() {
     Object.assign(cam, shots.viewer());
     applyCam();
-    footage.on = false;
-    footage.p = 0;
     dropped = false;
+    lastFast = -1;
     stage.style.visibility = '';
+    logoVideo.pause();
+    logoVideo.currentTime = 0;
+    slow.pause();
+    slow.currentTime = 0;
     gsap.set(world, { opacity: 1 });
-    gsap.set('.shot', { opacity: 0, clearProps: 'transform,filter' });
-    gsap.set('.logo-front', { filter: 'brightness(0.05)' });
-    gsap.set('.logo-light', { '--sweep': '100%' });
+    gsap.set('.shot', { opacity: 0, clearProps: 'transform' });
     gsap.set('.ed-bar, .ed-thumbs', { opacity: 0 });
     gsap.set('.viewer', { '--frame': 0 });
-    gsap.set(canvas, { opacity: 0, y: 0, yPercent: 60, rotationX: 28, filter: 'blur(8px)' });
+    gsap.set(footageEl, { opacity: 0, y: 0, yPercent: 60, rotationX: 28, filter: 'blur(8px)' });
+    gsap.set(fastCanvas, { opacity: 0 });
     gsap.set(mark, { opacity: 0, xPercent: -50, yPercent: -50, y: 0, scale: 1 });
     gsap.set(cue, { opacity: 0 });
     gsap.set('.about-line', { opacity: 0 });
@@ -233,44 +224,49 @@
     measureMark();
   }
 
+  // Acts 2-4, started when the logo video ends.
   function build() {
-    tl = gsap.timeline({ onUpdate: applyCam });
+    tl = gsap.timeline({ paused: true, onUpdate: applyCam });
 
-    // 1. Pure black, silence. The logo appears only where light catches it.
-    tl.to('.logo-front', { opacity: 1, filter: 'brightness(0.8)', duration: 4.6, ease: 'sine.inOut' }, 0.6)
-      .to('.logo-light', { opacity: 0.9, duration: 0.8 }, 1.0)
-      .to('.logo-light', { '--sweep': '0%', duration: 2.2, ease: 'sine.inOut' }, 1.0)
-      .set('.logo-light', { '--sweep': '100%' }, 3.3)
-      .to('.logo-light', { '--sweep': '0%', duration: 2.0, ease: 'sine.inOut' }, 3.3)
-      .to('.logo-light', { opacity: 0, duration: 0.6 }, 4.9)
-
-    // 2. The logo turns to its diagonal and settles inside the editor.
-      .to('.logo-front', { rotationX: 14, rotationY: -40, rotationZ: -22, scale: 0.9, duration: 2.4, ease: 'power2.inOut' }, 5.2)
-      .to('.logo-front', { opacity: 0, duration: 1.0, ease: 'power1.inOut' }, 6.0)
+    // 2. Swap to the logo's last frame as a still, turn it to the diagonal, settle in the editor.
+    tl.set('.logo-end', { opacity: 1 }, 0)
+      .set(logoVideo, { opacity: 0 }, 0.05)
+      .to('.logo-end', { rotationX: 14, rotationY: -40, rotationZ: -22, scale: 0.9, duration: 2.4, ease: 'power2.inOut' }, 0)
+      .to('.logo-end', { opacity: 0, duration: 1.0, ease: 'power1.inOut' }, 0.8)
       .fromTo('.logo-angle',
         { opacity: 0, rotationX: -8, rotationY: 26, rotationZ: 12, scale: 1.08 },
-        { opacity: 1, rotationX: 0, rotationY: 0, rotationZ: 0, scale: 1, duration: 2.4, ease: 'power2.out' }, 6.0)
-      .to(cam, { ...shots.editor(), duration: 3.2, ease: 'power3.inOut' }, 5.4)
-      .to('.ed-bar, .ed-thumbs', { opacity: 1, duration: 1.4, stagger: 0.2 }, 6.8)
-      .to('.viewer', { '--frame': 1, duration: 1.2 }, 7.0)
+        { opacity: 1, rotationX: 0, rotationY: 0, rotationZ: 0, scale: 1, duration: 2.4, ease: 'power2.out' }, 0.8)
+      .to(cam, { ...shots.editor(), duration: 3.2, ease: 'power3.inOut' }, 0.2)
+      .to('.ed-bar, .ed-thumbs', { opacity: 1, duration: 1.4, stagger: 0.2 }, 1.6)
+      .to('.viewer', { '--frame': 1, duration: 1.2 }, 1.8)
 
     // 3. Camera descends. The logo falls away above, the timeline rises from below.
-      .to(cam, { ...shots.below(), duration: 3.4, ease: 'power2.in' }, 8.8)
-      .to(world, { opacity: 0, duration: 1.8, ease: 'power1.in' }, 9.8)
-      .call(startFootage, null, 9.4)
-      .to(canvas, { opacity: 1, yPercent: 0, rotationX: 0, filter: 'blur(0px)', duration: 3.0, ease: 'power3.out' }, 9.4)
-      .set(canvas, { filter: 'none' }, 12.4)
-      .call(() => sound.level(0.25, 2.5), null, 10.6)
+      .to(cam, { ...shots.below(), duration: 3.4, ease: 'power2.in' }, 3.6)
+      .to(world, { opacity: 0, duration: 1.8, ease: 'power1.in' }, 4.6)
+      .call(() => { slow.play().catch(() => {}); }, null, 4.2)
+      .to(footageEl, { opacity: 1, yPercent: 0, rotationX: 0, filter: 'blur(0px)', duration: 3.0, ease: 'power3.out' }, 4.2)
+      .set(footageEl, { filter: 'none' }, 7.2)
+      .call(() => sound.level(0.25, 2.5), null, 5.4)
 
     // 4. The timeline breathes. Sound at full presence. The wordmark arrives quietly.
-      .call(() => sound.level(0.55, 2), null, 12.4)
-      .to(mark, { opacity: 1, duration: 1.8, ease: 'power1.out' }, 12.9)
-      .call(openScroll, null, 14.4);
+      .call(() => sound.level(0.55, 2), null, 7.2)
+      .to(mark, { opacity: 1, duration: 1.8, ease: 'power1.out' }, 7.7)
+      .call(openScroll, null, 9.2);
   }
 
-  function play() {
+  function whenReady(el, timeoutMs) {
+    return new Promise((resolve) => {
+      if (el.readyState >= 3) return resolve();
+      const done = () => { el.removeEventListener('canplaythrough', done); resolve(); };
+      el.addEventListener('canplaythrough', done);
+      setTimeout(done, timeoutMs);
+    });
+  }
+
+  async function play() {
+    const me = ++run;
     if (tl) tl.kill();
-    gsap.killTweensOf([canvas, mark, '.about-line']);
+    gsap.killTweensOf([footageEl, mark, '.about-line']);
     scrollOpen = false;
     root.classList.add('locked');
     replayBtn.classList.remove('show');
@@ -279,20 +275,39 @@
     sound.intensity(0);
     reset();
     build();
-    if (reduceMotion) tl.progress(1);
+    loadFastFrames();
+
+    if (reduceMotion) { tl.progress(1); return; }
+
+    // 1. Pure black and silence while the logo loads, then the logo video plays once.
+    await whenReady(logoVideo, 5000);
+    if (me !== run) return;
+    await new Promise((r) => setTimeout(r, 400));
+    if (me !== run) return;
+    gsap.set(logoVideo, { opacity: 1 });
+    let started = false;
+    const next = () => { if (!started && me === run) { started = true; tl.play(); } };
+    logoVideo.addEventListener('ended', next, { once: true });
+    logoVideo.play().catch(() => {
+      // Autoplay refused (e.g. iOS low power mode): show the final frame and move on.
+      gsap.set(logoVideo, { opacity: 0 });
+      gsap.fromTo('.logo-end', { opacity: 0 }, { opacity: 1, duration: 2.5, onComplete: next });
+    });
+    setTimeout(next, 9000); // never hang on a stalled video
   }
 
   /* ---------- Acts 5-6 (scroll) ---------- */
 
   function drop() {
     dropped = true;
-    gsap.killTweensOf([canvas, mark]);
-    gsap.to([canvas, mark], {
+    gsap.killTweensOf([footageEl, mark]);
+    gsap.to([footageEl, mark], {
       y: innerHeight * 1.2,
       duration: 0.42,
       ease: 'power4.in',
       onComplete: () => {
         sound.cut();
+        slow.pause();
         stage.style.visibility = 'hidden';
       },
     });
@@ -303,8 +318,9 @@
   function undrop() {
     dropped = false;
     stage.style.visibility = '';
-    gsap.killTweensOf([canvas, mark]);
-    gsap.to([canvas, mark], { y: 0, duration: 0.6, ease: 'power3.out' });
+    slow.play().catch(() => {});
+    gsap.killTweensOf([footageEl, mark]);
+    gsap.to([footageEl, mark], { y: 0, duration: 0.6, ease: 'power3.out' });
     sound.level(0.55, 0.6);
   }
 
@@ -312,8 +328,10 @@
     if (!scrollOpen) return;
     const dist = Math.max(1, track.offsetHeight - innerHeight);
     const p = Math.min(1, Math.max(0, scrollY / dist));
-    footage.p = p;
     sound.intensity(p);
+    // The fast timeline takes over from the slow one in the first stretch of scroll.
+    drawFast(p);
+    fastCanvas.style.opacity = String(Math.min(1, p / 0.08));
     if (!dropped) gsap.set(mark, { scale: 1 + p * (maxScale - 1) });
     gsap.set(cue, { opacity: Math.max(0, 0.5 - p * 10) });
     if (!dropped && p >= 0.995) drop();

@@ -14,7 +14,7 @@
 
 <!--
   Intro, acts 1-6 (see docs/brand.md):
-  1 logo emerges through light   2 logo rotates into the editor
+  1 logo emerges through light (logo.mp4)   2 logo rotates into the editor
   3 camera descends, timeline rises   4 timeline breathes, wordmark appears
   5 scroll: wordmark grows, timeline accelerates   6 the drop
 -->
@@ -29,20 +29,30 @@
 
     <div class="viewer">
       <div class="logo-rig">
-        <img class="shot logo-front" src="assets/img/logo-front.jpg" alt="">
-        <img class="shot logo-light" src="assets/img/logo-front.jpg" alt="">
+        <video class="shot logo-video" muted playsinline preload="auto">
+          <source src="assets/video/logo.mp4" type="video/mp4">
+          <source src="assets/video/logo.webm" type="video/webm">
+        </video>
+        <img class="shot logo-end" src="assets/img/logo-end.jpg" alt="">
         <img class="shot logo-angle" src="assets/img/logo-angle.jpg" alt="">
       </div>
     </div>
 
     <div class="ed-thumbs">
-      <img src="assets/img/logo-front.jpg" alt="">
+      <img src="assets/img/logo-end.jpg" alt="">
       <img class="on" src="assets/img/logo-angle.jpg" alt="">
-      <img src="assets/img/timeline.jpg" alt="">
+      <img src="assets/img/timeline-poster.jpg" alt="">
     </div>
   </div>
 
-  <canvas class="footage"></canvas>
+  <!-- Slow timeline plays through act 4; the fast one is scrubbed frame by frame with the scroll. -->
+  <div class="footage">
+    <video class="slow" muted playsinline loop preload="auto" poster="assets/img/timeline-poster.jpg">
+      <source src="assets/video/timeline-slow.mp4" type="video/mp4">
+      <source src="assets/video/timeline-slow.webm" type="video/webm">
+    </video>
+    <canvas class="fast"></canvas>
+  </div>
 
   <p class="wordmark hero-mark">D<span class="inv">V</span>YFOVR</p>
   <span class="scroll-cue"></span>
