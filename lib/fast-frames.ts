@@ -15,7 +15,7 @@ export function loadFastFrames() {
   images = Array.from({ length: COUNT }, (_, i) => {
     const img = new Image();
     img.decoding = "async";
-    img.src = `/assets/frames/fast/${String(i).padStart(3, "0")}.jpg`;
+    img.src = `/assets/frames/fast/${String(i).padStart(3, "0")}.webp`;
     return img;
   });
   return images;

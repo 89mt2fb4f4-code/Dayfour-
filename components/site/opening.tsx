@@ -149,7 +149,7 @@ export default function Opening() {
                 mediaSrc="/assets/video/timeline-slow.mp4"
                 mediaSrcAlt="/assets/video/timeline-slow.webm"
                 posterSrc="/assets/img/timeline-poster.jpg"
-                bgImageSrc="/assets/img/intro-frame-bg.png"
+                bgImageSrc="/assets/img/intro-frame-bg.jpg"
                 titleLines={["We don’t", "do normal"]}
                 caption="Visual aesthetic"
                 onProgress={(p, target) => {
