@@ -74,11 +74,11 @@ export function WorkCard({ id, title, meta, youtubeUrl, cover, className }: Work
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Size changes go through layout (FLIP, transform-based) rather than animating
-          width, so expanding never re-lays out the page each frame. */}
+      {/* Width animates only for the moment of a tap. (A layout/FLIP animation fights the
+          timeline's sideways transform, so plain width is the right tool here.) */}
       <motion.div
-        layout
-        className={isExpanded ? "w-[min(86vw,640px)]" : "w-[min(62vw,360px)]"}
+        initial={false}
+        animate={{ width: isExpanded ? "min(86vw, 640px)" : "min(62vw, 360px)" }}
         transition={{ type: "spring", stiffness: 400, damping: 35 }}
       >
       <motion.div
@@ -88,7 +88,18 @@ export function WorkCard({ id, title, meta, youtubeUrl, cover, className }: Work
         <div className="relative aspect-video w-full">
           {still && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={still} alt="" className="absolute inset-0 h-full w-full object-cover grayscale-[0.2]" draggable={false} />
+            <img
+              src={still}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover grayscale-[0.2]"
+              draggable={false}
+              // Not every YouTube video has the largest still; fall back to the next size.
+              onError={(e) => {
+                const img = e.currentTarget;
+                if (videoId && !cover && !img.src.includes("hqdefault")) img.src = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+                else img.style.visibility = "hidden";
+              }}
+            />
           )}
           <AnimatePresence>
             {isExpanded && videoId && (

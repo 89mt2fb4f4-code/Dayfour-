@@ -108,10 +108,22 @@ export default function Timeline({
       if (!section) return;
       const isMobile = window.innerWidth < 600;
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: section, start: "top top", end: isMobile ? "82% 50%" : "92% bottom", scrub: true },
+        scrollTrigger: { trigger: section, start: "top top", end: isMobile ? "82% 50%" : "92% bottom", scrub: true, invalidateOnRefresh: true },
         defaults: { ease: "none" },
       });
-      tl.fromTo(wholeSliderRef.current, { xPercent: 0 }, { xPercent: isMobile ? -(100 - 100 / (1 + count * 0.55)) : -65 });
+      // Slide until the right edge of the last card reaches the screen edge (measured, so
+      // it holds for any number of projects and any card width).
+      const travel = () => {
+        const slider = wholeSliderRef.current;
+        if (!slider) return 0;
+        const left = slider.getBoundingClientRect().left;
+        let right = 0;
+        slider.querySelectorAll("[data-tl-item], [data-tl-item] *").forEach((el) => {
+          right = Math.max(right, el.getBoundingClientRect().right - left);
+        });
+        return -Math.max(0, right + window.innerWidth * 0.07 - window.innerWidth);
+      };
+      tl.fromTo(wholeSliderRef.current, { x: 0 }, { x: travel });
 
       const lineWidth = isMobile ? "65%" : "98%";
       if (reducedMotion) {
@@ -176,11 +188,21 @@ export default function Timeline({
         });
       });
 
-      const handleResize = () => ScrollTrigger.refresh();
+      // Sections above this one change height after load (the opening mounts late), so
+      // re-measure scroll positions whenever the page height changes, not only on resize.
+      let t = 0;
+      const handleResize = () => {
+        clearTimeout(t);
+        t = window.setTimeout(() => ScrollTrigger.refresh(), 150);
+      };
       window.addEventListener("resize", handleResize);
+      const pageSize = new ResizeObserver(handleResize);
+      pageSize.observe(document.body);
       return () => {
         splits.forEach((s) => s.revert());
         window.removeEventListener("resize", handleResize);
+        pageSize.disconnect();
+        clearTimeout(t);
       };
     },
     { dependencies: [normalizedDuration, reducedMotion, items], scope: sectionRef },
@@ -189,7 +211,7 @@ export default function Timeline({
   const itemBody = (item: TimelineItem, alignBottom: boolean) => {
     const k = cls(item.id);
     return (
-      <div className={`flex h-full w-full flex-col space-y-[1vw] ${alignBottom ? "justify-end" : ""}`}>
+      <div data-tl-item className={`flex h-full w-full flex-col space-y-[1vw] ${alignBottom ? "justify-end" : ""}`}>
         {item.media && <div className={`media-${k} mb-[2vw] max-[600px]:mb-[4vw]`}>{item.media}</div>}
         {!item.media && (
           <>

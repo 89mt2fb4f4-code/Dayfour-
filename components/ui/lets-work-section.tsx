@@ -11,6 +11,7 @@ import { useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import MetallicButton from "@/components/ui/metallic-button";
 import Crosshairs from "@/components/ui/crosshairs";
+import { getSound } from "@/lib/sound";
 
 interface LetsWorkTogetherProps {
   contactHref: string;
@@ -23,6 +24,7 @@ export function LetsWorkTogether({ contactHref, contactLabel = "Message us" }: L
   const [showSuccess, setShowSuccess] = useState(false);
 
   const handleClick = () => {
+    getSound().accent();
     setIsClicked(true);
     setTimeout(() => setShowSuccess(true), 500);
   };

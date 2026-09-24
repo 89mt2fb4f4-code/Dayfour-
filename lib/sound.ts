@@ -127,6 +127,38 @@ class DayfourSound {
     g.linearRampToValueAtTime(active ? 0.9 : 0, t + (active ? 1.5 : 4));
   }
 
+  /** The Let's work arrow: a soft air sweep and three rising bell notes. */
+  accent() {
+    if (!this.ctx || !this.on) return;
+    const ctx = this.ctx;
+    const t = ctx.currentTime + 0.02;
+
+    // Air sweep: a short burst of noise through a band that rises.
+    const len = Math.floor(ctx.sampleRate * 0.7);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    const air = ctx.createBufferSource();
+    air.buffer = buf;
+    const band = ctx.createBiquadFilter();
+    band.type = "bandpass";
+    band.Q.value = 1.2;
+    band.frequency.setValueAtTime(500, t);
+    band.frequency.exponentialRampToValueAtTime(4200, t + 0.55);
+    const airGain = ctx.createGain();
+    airGain.gain.setValueAtTime(0.0001, t);
+    airGain.gain.exponentialRampToValueAtTime(0.06, t + 0.18);
+    airGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.65);
+    air.connect(band).connect(airGain);
+    airGain.connect(this.master);
+    airGain.connect(this.reverb);
+    air.start(t);
+    air.stop(t + 0.7);
+
+    // Bells, rising, landing as the sweep ends.
+    [659.25, 987.77, 1318.51].forEach((f, i) => this.bell(f, t + 0.16 + i * 0.09, 0.06, 3.5));
+  }
+
   /** 0..1 from the timeline expansion. After it completes, the pad fades out slowly. */
   rise(p: number) {
     if (!this.ctx) return;
