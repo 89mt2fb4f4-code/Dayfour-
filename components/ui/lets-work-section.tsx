@@ -4,7 +4,8 @@
  * Adapted from 21st.dev "Let's work together".
  * Changes for DAYFOUR: the "Let's talk" button is the Metallic Button and opens the
  * studio's Instagram DM; the status dot is white; no calendar icon or email (private
- * by design); serif headline; the handles sit at the foot of the section.
+ * by design); serif headline. After the tap: Let's talk, the wordmark, the button,
+ * with the closing line staying in place.
  */
 import type React from "react";
 import { useState } from "react";
@@ -14,10 +15,9 @@ import MetallicButton from "@/components/ui/metallic-button";
 interface LetsWorkTogetherProps {
   contactHref: string;
   contactLabel?: string;
-  note?: string;
 }
 
-export function LetsWorkTogether({ contactHref, contactLabel = "Message us", note = "By appointment." }: LetsWorkTogetherProps) {
+export function LetsWorkTogether({ contactHref, contactLabel = "Message us" }: LetsWorkTogetherProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -53,13 +53,20 @@ export function LetsWorkTogether({ contactHref, contactLabel = "Message us", not
             </h3>
           </div>
 
+          <p
+            className="font-serif text-4xl font-light tracking-[0.15em] text-foreground transition-all duration-500"
+            style={{ paddingLeft: "0.15em", transform: showSuccess ? "translateY(0)" : "translateY(10px)", opacity: showSuccess ? 1 : 0, transitionDelay: "300ms" }}
+          >
+            DɅYFOVR
+          </p>
+
           {/* The call to action is the metallic button (combined component). */}
           <div
             className="transition-all duration-500"
             style={{
               transform: showSuccess ? "translateY(0)" : "translateY(15px)",
               opacity: showSuccess ? 1 : 0,
-              transitionDelay: "150ms",
+              transitionDelay: "450ms",
             }}
           >
             <MetallicButton
@@ -69,13 +76,6 @@ export function LetsWorkTogether({ contactHref, contactLabel = "Message us", not
               onClick={() => window.open(contactHref, "_blank", "noopener,noreferrer")}
             />
           </div>
-
-          <span
-            className="font-serif text-base italic text-muted-foreground transition-all duration-500"
-            style={{ transform: showSuccess ? "translateY(0)" : "translateY(10px)", opacity: showSuccess ? 1 : 0, transitionDelay: "450ms" }}
-          >
-            {note}
-          </span>
         </div>
 
         <div
@@ -164,21 +164,12 @@ export function LetsWorkTogether({ contactHref, contactLabel = "Message us", not
         </button>
 
         <div
-          className="mt-8 flex flex-col items-center gap-4 text-center transition-all delay-100 duration-500"
-          style={{ opacity: isClicked ? 0 : 1, transform: isClicked ? "translateY(20px)" : "translateY(0)", pointerEvents: isClicked ? "none" : "auto" }}
+          className="mt-8 flex flex-col items-center gap-4 text-center"
         >
           <p className="max-w-[32ch] text-sm leading-relaxed text-muted-foreground">
             Have a vision? Tell us about it. Not everyone. The right ones.
           </p>
         </div>
-      </div>
-
-      <div
-        className="absolute inset-x-0 space-y-1 text-center font-sans text-xs font-light tracking-[0.08em] text-df-grey-light"
-        style={{ bottom: "calc(56px + env(safe-area-inset-bottom, 0px))" }}
-      >
-        <p>@dayfour.studio</p>
-        <p>@god.kagari</p>
       </div>
     </section>
   );
