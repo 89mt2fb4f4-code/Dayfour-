@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Crosshairs from "@/components/ui/crosshairs";
 
 /** "Short Film. Commercial. Documentary." set in a thin frame with corner dots. */
 export default function Disciplines() {
@@ -11,6 +12,7 @@ export default function Disciplines() {
   ];
   return (
     <section aria-label="What we make" className="relative flex h-[72svh] items-center justify-center overflow-hidden bg-black px-6">
+      <Crosshairs seed={23} count={6} />
       <motion.div
         initial="hidden"
         whileInView="visible"
@@ -18,15 +20,23 @@ export default function Disciplines() {
         transition={{ staggerChildren: 0.12 }}
         className="relative px-5 py-4"
       >
-        {/* Frame: lines run past the corners, with a dot at each corner. */}
+        {/* Frame: lines run past the corners, a second rail sits just under the bottom edge,
+            and a dot marks each crossing (after the "Give yourself permission" reference). */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
           <span className="absolute -left-[100vw] -right-[100vw] top-0 h-px bg-white/25" />
           <span className="absolute -left-[100vw] -right-[100vw] bottom-0 h-px bg-white/25" />
-          <span className="absolute -bottom-[30svh] -top-[30svh] left-0 w-px bg-white/25" />
-          <span className="absolute -bottom-[30svh] -top-[30svh] right-0 w-px bg-white/25" />
-          {["left-0 top-0", "right-0 top-0", "left-0 bottom-0", "right-0 bottom-0"].map((pos) => (
-            <span key={pos} className={`absolute ${pos} size-2 rounded-full bg-white`} style={{ translate: `${pos.includes("left") ? "-50%" : "50%"} ${pos.includes("top") ? "-50%" : "50%"}` }} />
-          ))}
+          <span className="absolute -left-[100vw] -right-[100vw] h-px bg-white/25" style={{ top: "calc(100% + 18px)" }} />
+          <span className="absolute -bottom-[40svh] -top-[40svh] left-0 w-px bg-white/25" />
+          <span className="absolute -bottom-[40svh] -top-[40svh] right-0 w-px bg-white/25" />
+          {["0%", "100%", "calc(100% + 18px)"].flatMap((y) =>
+            ["0%", "100%"].map((x) => (
+              <span
+                key={y + x}
+                className="absolute size-[6px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
+                style={{ left: x, top: y }}
+              />
+            )),
+          )}
         </div>
         {lines.map(({ text, bold }) => (
           <div key={text} className="overflow-hidden">

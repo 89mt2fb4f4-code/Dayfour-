@@ -10,6 +10,7 @@ import type React from "react";
 import { useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import MetallicButton from "@/components/ui/metallic-button";
+import Crosshairs from "@/components/ui/crosshairs";
 
 interface LetsWorkTogetherProps {
   contactHref: string;
@@ -28,6 +29,7 @@ export function LetsWorkTogether({ contactHref, contactLabel = "Message us" }: L
 
   return (
     <section id="contact" className="relative flex min-h-[100svh] items-center justify-center bg-black px-6">
+      <Crosshairs seed={73} count={7} />
       <div className="relative flex flex-col items-center gap-12">
         <div
           className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-8 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"

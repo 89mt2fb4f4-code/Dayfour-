@@ -12,6 +12,7 @@
  */
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { motion, useScroll, type Variants } from "framer-motion";
+import Crosshairs from "@/components/ui/crosshairs";
 
 export interface Chapter {
   id: string;
@@ -72,6 +73,7 @@ const ChapterBackgrounds = ({ chapters, current }: { chapters: Chapter[]; curren
       </motion.div>
     ))}
     <FilmGrain />
+    <Crosshairs seed={37} count={9} className="z-20" />
   </div>
 );
 
