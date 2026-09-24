@@ -12,6 +12,7 @@
  */
 import { useEffect, useRef, type RefObject } from "react";
 import { drawFrame, frameAt, loadFastFrames, loopIndex, scrubIndex, setLooping } from "@/lib/fast-frames";
+import { getSound } from "@/lib/sound";
 
 interface ExpandSceneProps {
   trackRef: RefObject<HTMLElement | null>;
@@ -92,6 +93,8 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
       canvas.style.opacity = String(smooth(0.02, 0.1, p));
       const done = p >= 0.995;
       setLooping(done);
+      // The slow-timeline hum plays while the scene is up, and lets go once it is full-bleed.
+      getSound().scene(!done);
       const index = done ? loopIndex() : scrubIndex(smooth(0.04, 1, p));
       const img = frameAt(index);
       if (img && index !== lastFrame) {
@@ -113,6 +116,7 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
 
     const seen = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
+      if (!visible) getSound().scene(false);
       if (visible) {
         void videoRef.current?.play().catch(() => {});
         schedule();

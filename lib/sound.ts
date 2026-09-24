@@ -6,6 +6,8 @@
  *  music  A quiet, slowly shifting chord bed with the odd soft bell note. Dark,
  *         warm, no noise. This is the site's background.
  *  hit    Once, as the logo reveals: a low bloom and a bell chord that fade away.
+ *  scene  The slow-timeline hum: a low, warm drone that plays only while the
+ *         timeline scene is on screen, and fades away after it.
  *  rise   A tonal pad that climbs and quickens with the timeline expansion, then
  *         slowly fades out once the footage is done.
  *
@@ -36,6 +38,8 @@ class DayfourSound {
   private riseDepth!: GainNode;
   private riseVoices: { osc: OscillatorNode; base: number }[] = [];
   private riseDone = false;
+  private sceneGain!: GainNode;
+  private sceneOn = false;
   private chordTimer: number | null = null;
   private bellTimer: number | null = null;
   private chordIndex = 0;
@@ -110,6 +114,18 @@ class DayfourSound {
     [220, 329.63, 493.88, 659.25].forEach((f, i) => this.bell(f, t + 0.12 + i * 0.07, 0.07, 6));
   }
 
+  /** The slow-timeline hum: on while the timeline scene is showing, fading out after. */
+  scene(active: boolean) {
+    if (active === this.sceneOn) return;
+    this.sceneOn = active;
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const g = this.sceneGain.gain;
+    g.cancelScheduledValues(t);
+    g.setValueAtTime(g.value, t);
+    g.linearRampToValueAtTime(active ? 0.32 : 0, t + (active ? 2.5 : 4));
+  }
+
   /** 0..1 from the timeline expansion. After it completes, the pad fades out slowly. */
   rise(p: number) {
     if (!this.ctx) return;
@@ -171,6 +187,40 @@ class DayfourSound {
     this.musicBus.connect(musicTone);
     musicTone.connect(this.master);
     musicTone.connect(this.reverb);
+
+    // Scene: the slow-timeline hum. Low sines, a soft breath, no noise.
+    this.sceneGain = ctx.createGain();
+    this.sceneGain.gain.value = 0;
+    const sceneTone = ctx.createBiquadFilter();
+    sceneTone.type = "lowpass";
+    sceneTone.frequency.value = 420;
+    const breath = ctx.createGain();
+    breath.gain.value = 0.85;
+    sceneTone.connect(breath).connect(this.sceneGain);
+    this.sceneGain.connect(this.master);
+    this.sceneGain.connect(this.reverb);
+    const slow = ctx.createOscillator();
+    slow.frequency.value = 0.06;
+    const slowDepth = ctx.createGain();
+    slowDepth.gain.value = 0.15;
+    slow.connect(slowDepth).connect(breath.gain);
+    slow.start();
+    ([[55, 0.34, "sine"], [82.41, 0.2, "sine"], [110, 0.06, "triangle"], [164.81, 0.025, "sine"]] as const).forEach(
+      ([f, g, type], i) => {
+        const o = ctx.createOscillator();
+        o.type = type;
+        o.frequency.value = f;
+        o.detune.value = (i % 2 ? 1 : -1) * 4;
+        const v = ctx.createGain();
+        v.gain.value = g;
+        o.connect(v).connect(sceneTone);
+        o.start();
+      },
+    );
+    if (this.sceneOn) {
+      this.sceneOn = false;
+      this.scene(true);
+    }
 
     // Rise: three tonal voices with a tremolo that quickens. No noise.
     this.riseFilter = ctx.createBiquadFilter();
