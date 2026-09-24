@@ -5,7 +5,7 @@
  * fixed, parallaxing background. Here the background is the fast timeline, still
  * running, so the section below slides over moving footage instead of a frozen frame.
  */
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { drawFrame, frameAt, loadFastFrames, loopIndex, setLooping } from "@/lib/fast-frames";
 

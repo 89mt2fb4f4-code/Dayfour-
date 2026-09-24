@@ -193,7 +193,7 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
       <div
         ref={boxRef}
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden"
-        style={{ width: 300, height: 400, boxShadow: "0px 0px 50px rgba(0, 0, 0, 0.3)" }}
+        style={{ width: 300, height: 400, boxShadow: "0px 0px 50px rgba(0, 0, 0, 0.3)", contain: "strict" }}
       >
         <div ref={mediaRef} className="absolute inset-0 will-change-transform">
         <video

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import Crosshairs from "@/components/ui/crosshairs";
 
 /** "Short Film. Commercial. Documentary." set in a thin frame with corner dots. */
@@ -41,7 +41,7 @@ export default function Disciplines() {
         {lines.map(({ text, bold }) => (
           <div key={text} className="overflow-hidden">
             <motion.p
-              variants={{ hidden: { y: "100%", opacity: 0 }, visible: { y: "0%", opacity: 1, transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] } } }}
+              variants={{ hidden: { transform: "translateY(100%)", opacity: 0 }, visible: { transform: "translateY(0%)", opacity: 1, transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] } } }}
               className={`font-sans text-[2.6rem] uppercase leading-[1.02] tracking-[-0.01em] text-white ${bold ? "text-right font-medium" : "font-light"}`}
             >
               {text}

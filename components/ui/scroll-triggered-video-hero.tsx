@@ -11,7 +11,7 @@
  *  - A chapter can render its own layout (the first one sets the title vertically).
  */
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { motion, useScroll, type Variants } from "framer-motion";
+import { motion, useScroll, type Variants } from "motion/react";
 import Crosshairs from "@/components/ui/crosshairs";
 
 export interface Chapter {
@@ -32,13 +32,13 @@ const textContainer: Variants = {
 };
 
 export const textReveal: Variants = {
-  hidden: { y: "100%", opacity: 0 },
-  visible: { y: "0%", opacity: 1, transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] } },
+  hidden: { transform: "translateY(100%)", opacity: 0 },
+  visible: { transform: "translateY(0%)", opacity: 1, transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] } },
 };
 
 export const fadeIn: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.9, delay: 0.35, ease: "easeOut" } },
+  hidden: { opacity: 0, transform: "translateY(20px)" },
+  visible: { opacity: 1, transform: "translateY(0px)", transition: { duration: 0.9, delay: 0.35, ease: "easeOut" } },
 };
 
 const FilmGrain = () => (

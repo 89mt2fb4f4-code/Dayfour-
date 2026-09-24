@@ -9,7 +9,7 @@
  */
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from "motion/react";
 import { youtubeEmbed, youtubeId, youtubeThumb } from "@/lib/youtube";
 
 const OPEN_EVENT = "dayfour:work-open";
@@ -74,11 +74,16 @@ export function WorkCard({ id, title, meta, youtubeUrl, cover, className }: Work
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
     >
+      {/* Size changes go through layout (FLIP, transform-based) rather than animating
+          width, so expanding never re-lays out the page each frame. */}
+      <motion.div
+        layout
+        className={isExpanded ? "w-[min(86vw,640px)]" : "w-[min(62vw,360px)]"}
+        transition={{ type: "spring", stiffness: 400, damping: 35 }}
+      >
       <motion.div
         className="relative overflow-hidden border border-white/15 bg-black"
         style={{ rotateX: springRotateX, rotateY: springRotateY, transformStyle: "preserve-3d" }}
-        animate={{ width: isExpanded ? "min(86vw, 640px)" : "min(62vw, 360px)" }}
-        transition={{ type: "spring", stiffness: 400, damping: 35 }}
       >
         <div className="relative aspect-video w-full">
           {still && (
@@ -110,6 +115,7 @@ export function WorkCard({ id, title, meta, youtubeUrl, cover, className }: Work
             />
           )}
         </div>
+      </motion.div>
       </motion.div>
 
       <div className="mt-3 space-y-1">
