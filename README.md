@@ -40,3 +40,8 @@ export const projects: Project[] = [
 - `public/fonts/`: self-hosted fonts. Cormorant Garamond and Anton have an added Ʌ glyph (a flipped V)
   so the wordmark sets in one face.
 - `docs/brand.md`, `docs/references/`: brand rules and design references.
+
+## Deploy
+
+Hosted on Vercel (project `my-dayfour`), connected to this repo. The production branch is
+`claude/21st-server-check-klhree`: every push to it goes live at my-dayfour.vercel.app.
