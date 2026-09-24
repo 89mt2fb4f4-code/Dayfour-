@@ -99,7 +99,8 @@ export default function Header({
         <SheetContent
           side="right"
           hideClose
-          className="flex h-full w-full flex-col border-none bg-[#0a0a0a] px-7 pb-[calc(32px+env(safe-area-inset-bottom,0px))] pt-[calc(22px+env(safe-area-inset-top,0px))] text-white sm:max-w-md"
+          overlayClassName="bg-black/20"
+          className="flex h-full w-full flex-col border-none bg-black/35 shadow-none backdrop-blur-xl px-7 pb-[calc(32px+env(safe-area-inset-bottom,0px))] pt-[calc(22px+env(safe-area-inset-top,0px))] text-white sm:max-w-md"
         >
           <div className="flex items-center justify-between">
             <SheetTitle className="font-serif text-2xl font-light tracking-[0.15em] text-white">DɅYFOVR</SheetTitle>
