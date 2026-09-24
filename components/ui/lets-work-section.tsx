@@ -4,8 +4,7 @@
  * Adapted from 21st.dev "Let's work together".
  * Changes for DAYFOUR: the "Let's talk" button is the Metallic Button and opens the
  * studio's Instagram DM; the status dot is white; no calendar icon or email (private
- * by design); serif headline. After the tap: Let's talk, the wordmark, the button,
- * with the closing line staying in place.
+ * by design); serif headline. After the tap only the wordmark and the button remain.
  */
 import type React from "react";
 import { useState } from "react";
@@ -38,24 +37,9 @@ export function LetsWorkTogether({ contactHref, contactLabel = "Message us" }: L
             pointerEvents: showSuccess ? "auto" : "none",
           }}
         >
-          <div className="flex flex-col items-center gap-2">
-            <span
-              className="text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground transition-all duration-500"
-              style={{ transform: showSuccess ? "translateY(0)" : "translateY(10px)", opacity: showSuccess ? 1 : 0, transitionDelay: "100ms" }}
-            >
-              Good
-            </span>
-            <h3
-              className="font-serif text-4xl font-light tracking-tight text-foreground transition-all duration-500"
-              style={{ transform: showSuccess ? "translateY(0)" : "translateY(10px)", opacity: showSuccess ? 1 : 0, transitionDelay: "200ms" }}
-            >
-              Let&apos;s talk
-            </h3>
-          </div>
-
           <p
             className="font-serif text-4xl font-light tracking-[0.15em] text-foreground transition-all duration-500"
-            style={{ paddingLeft: "0.15em", transform: showSuccess ? "translateY(0)" : "translateY(10px)", opacity: showSuccess ? 1 : 0, transitionDelay: "300ms" }}
+            style={{ paddingLeft: "0.15em", transform: showSuccess ? "translateY(0)" : "translateY(10px)", opacity: showSuccess ? 1 : 0, transitionDelay: "150ms" }}
           >
             DɅYFOVR
           </p>
@@ -66,7 +50,7 @@ export function LetsWorkTogether({ contactHref, contactLabel = "Message us" }: L
             style={{
               transform: showSuccess ? "translateY(0)" : "translateY(15px)",
               opacity: showSuccess ? 1 : 0,
-              transitionDelay: "450ms",
+              transitionDelay: "300ms",
             }}
           >
             <MetallicButton
@@ -164,7 +148,8 @@ export function LetsWorkTogether({ contactHref, contactLabel = "Message us" }: L
         </button>
 
         <div
-          className="mt-8 flex flex-col items-center gap-4 text-center"
+          className="mt-8 flex flex-col items-center gap-4 text-center transition-all delay-100 duration-500"
+          style={{ opacity: isClicked ? 0 : 1, transform: isClicked ? "translateY(20px)" : "translateY(0)" }}
         >
           <p className="max-w-[32ch] text-sm leading-relaxed text-muted-foreground">
             Have a vision? Tell us about it. Not everyone. The right ones.
