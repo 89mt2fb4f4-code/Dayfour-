@@ -21,7 +21,8 @@ interface ExpandSceneProps {
   bgImageSrc: string;
   /** Two lines that slide apart as the media expands. */
   titleLines?: [string, string];
-  onProgress?: (progress: number) => void;
+  /** Eased progress, and the raw scroll position it is gliding toward. */
+  onProgress?: (progress: number, target: number) => void;
 }
 
 const clamp = (n: number, a = 0, b = 1) => Math.min(b, Math.max(a, n));
@@ -36,6 +37,7 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
   const boxRef = useRef<HTMLDivElement>(null);
   const shadeRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mediaRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const leftRef = useRef<HTMLHeadingElement>(null);
   const rightRef = useRef<HTMLHeadingElement>(null);
@@ -48,7 +50,10 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
     let lastP = -1;
     let lastFrame = -1;
     let visible = true;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     loadFastFrames();
+
+    let shown = -1; // eased progress that glides after the scroll target
 
     const paint = () => {
       raf = 0;
@@ -57,7 +62,10 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       const rect = track.getBoundingClientRect();
-      const p = clamp(-rect.top / Math.max(1, rect.height - vh));
+      const target = clamp(-rect.top / Math.max(1, rect.height - vh));
+      shown = shown < 0 || reduce ? target : shown + (target - shown) * 0.14;
+      if (Math.abs(target - shown) < 0.0004) shown = target;
+      const p = shown;
       const mobile = vw < 768;
 
       const startW = Math.min(300, vw * 0.78);
@@ -65,14 +73,17 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
       const e = p < 0.5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2;
       boxRef.current!.style.width = `${startW + (vw - startW) * e}px`;
       boxRef.current!.style.height = `${startH + (vh - startH) * e}px`;
+      // Davincho-style parallax inside the box: the footage drifts up and settles
+      // exactly as the box reaches full-bleed.
+      mediaRef.current!.style.transform = `translate3d(0, ${(1 - e) * 5}%, 0) scale(${1 + (1 - e) * 0.12})`;
       bgRef.current!.style.opacity = String(1 - p);
       shadeRef.current!.style.opacity = String(0.4 - p * 0.3);
 
       if (leftRef.current && rightRef.current) {
         const shift = p * (mobile ? 180 : 150);
         const fade = String(1 - smooth(0.55, 0.85, p));
-        leftRef.current.style.transform = `translateX(-${shift}vw)`;
-        rightRef.current.style.transform = `translateX(${shift}vw)`;
+        leftRef.current.style.transform = `translate3d(-${shift}vw, 0, 0)`;
+        rightRef.current.style.transform = `translate3d(${shift}vw, 0, 0)`;
         leftRef.current.style.opacity = fade;
         rightRef.current.style.opacity = fade;
       }
@@ -90,10 +101,10 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
 
       if (p !== lastP) {
         lastP = p;
-        progressRef.current?.(p);
+        progressRef.current?.(p, target);
       }
-      // Keep the footage moving once it is full-bleed, even without scrolling.
-      if (done) raf = requestAnimationFrame(paint);
+      // Keep going while easing toward the target, and keep the footage moving once full-bleed.
+      if (done || shown !== target) raf = requestAnimationFrame(paint);
     };
 
     const schedule = () => {
@@ -133,6 +144,7 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden"
         style={{ width: 300, height: 400, boxShadow: "0px 0px 50px rgba(0, 0, 0, 0.3)" }}
       >
+        <div ref={mediaRef} className="absolute inset-0 will-change-transform">
         <video
           ref={videoRef}
           poster={posterSrc}
@@ -149,6 +161,7 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
           {mediaSrcAlt && <source src={mediaSrcAlt} type="video/webm" />}
         </video>
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full object-cover opacity-0" />
+        </div>
         <div ref={shadeRef} className="absolute inset-0 bg-black/30" />
       </div>
 

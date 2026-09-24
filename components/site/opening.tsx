@@ -147,11 +147,11 @@ export default function Opening() {
                 posterSrc="/assets/img/timeline-poster.jpg"
                 bgImageSrc="/assets/img/intro-frame-bg.png"
                 titleLines={["We don’t", "do normal"]}
-                onProgress={(p) => {
+                onProgress={(p, target) => {
                   getSound().rise(p);
                   // Full-bleed: hand over to the identical footage window underneath, so the
                   // footage never slides when the pinned scene lets go.
-                  if (wrapRef.current) wrapRef.current.style.visibility = p >= 0.999 ? "hidden" : "";
+                  if (wrapRef.current) wrapRef.current.style.visibility = p >= 0.999 && target >= 0.999 ? "hidden" : "";
                 }}
               />
             }

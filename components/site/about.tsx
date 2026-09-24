@@ -30,7 +30,8 @@ const chapters: Chapter[] = [
     id: "who",
     title: "Who we work with",
     body: "Creatives. Brands. People with a vision who need someone who can see it too. Not everyone. The right ones.",
-    background: dark(26, 20, "#3e3e3e"),
+    // The last chapter falls to pure black at the bottom, so it runs straight into the work section.
+    background: `linear-gradient(to bottom, rgba(0,0,0,0) 35%, #000 92%), ${dark(26, 20, "#3e3e3e")}`,
   },
 ];
 
