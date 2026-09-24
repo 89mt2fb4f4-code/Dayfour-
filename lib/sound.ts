@@ -6,8 +6,8 @@
  *  music  A quiet, slowly shifting chord bed with the odd soft bell note. Dark,
  *         warm, no noise. This is the site's background.
  *  hit    Once, as the logo reveals: a low bloom and a bell chord that fade away.
- *  scene  The slow-timeline hum: a low, warm drone that plays only while the
- *         timeline scene is on screen, and fades away after it.
+ *  scene  The slow timeline's own audio (from its video), looped while the timeline
+ *         scene is on screen; it quickens with the expansion and fades away after.
  *  rise   A tonal pad that climbs and quickens with the timeline expansion, then
  *         slowly fades out once the footage is done.
  *
@@ -39,6 +39,7 @@ class DayfourSound {
   private riseVoices: { osc: OscillatorNode; base: number }[] = [];
   private riseDone = false;
   private sceneGain!: GainNode;
+  private sceneSource: AudioBufferSourceNode | null = null;
   private sceneOn = false;
   private chordTimer: number | null = null;
   private bellTimer: number | null = null;
@@ -114,7 +115,7 @@ class DayfourSound {
     [220, 329.63, 493.88, 659.25].forEach((f, i) => this.bell(f, t + 0.12 + i * 0.07, 0.07, 6));
   }
 
-  /** The slow-timeline hum: on while the timeline scene is showing, fading out after. */
+  /** The slow timeline's audio: on while the timeline scene is showing, fading out after. */
   scene(active: boolean) {
     if (active === this.sceneOn) return;
     this.sceneOn = active;
@@ -123,7 +124,7 @@ class DayfourSound {
     const g = this.sceneGain.gain;
     g.cancelScheduledValues(t);
     g.setValueAtTime(g.value, t);
-    g.linearRampToValueAtTime(active ? 0.32 : 0, t + (active ? 2.5 : 4));
+    g.linearRampToValueAtTime(active ? 0.9 : 0, t + (active ? 1.5 : 4));
   }
 
   /** 0..1 from the timeline expansion. After it completes, the pad fades out slowly. */
@@ -142,6 +143,7 @@ class DayfourSound {
       this.riseGain.gain.cancelScheduledValues(t);
       this.riseGain.gain.setTargetAtTime(p > 0.001 ? 0.04 + q * 0.08 : 0, t, 0.15);
     }
+    this.sceneSource?.playbackRate.setTargetAtTime(1 + q * 0.6, t, 0.15);
     this.riseFilter.frequency.setTargetAtTime(600 + q * 2600, t, 0.1);
     this.riseVoices.forEach(({ osc, base }) => osc.frequency.setTargetAtTime(base * (1 + q * 0.25), t, 0.12));
     this.riseLfo.frequency.setTargetAtTime(0.3 + q * 5, t, 0.15);
@@ -188,35 +190,25 @@ class DayfourSound {
     musicTone.connect(this.master);
     musicTone.connect(this.reverb);
 
-    // Scene: the slow-timeline hum. Low sines, a soft breath, no noise.
+    // Scene: the slow timeline's own audio (desk clicks and room tone), looped.
     this.sceneGain = ctx.createGain();
     this.sceneGain.gain.value = 0;
-    const sceneTone = ctx.createBiquadFilter();
-    sceneTone.type = "lowpass";
-    sceneTone.frequency.value = 420;
-    const breath = ctx.createGain();
-    breath.gain.value = 0.85;
-    sceneTone.connect(breath).connect(this.sceneGain);
     this.sceneGain.connect(this.master);
-    this.sceneGain.connect(this.reverb);
-    const slow = ctx.createOscillator();
-    slow.frequency.value = 0.06;
-    const slowDepth = ctx.createGain();
-    slowDepth.gain.value = 0.15;
-    slow.connect(slowDepth).connect(breath.gain);
-    slow.start();
-    ([[55, 0.34, "sine"], [82.41, 0.2, "sine"], [110, 0.06, "triangle"], [164.81, 0.025, "sine"]] as const).forEach(
-      ([f, g, type], i) => {
-        const o = ctx.createOscillator();
-        o.type = type;
-        o.frequency.value = f;
-        o.detune.value = (i % 2 ? 1 : -1) * 4;
-        const v = ctx.createGain();
-        v.gain.value = g;
-        o.connect(v).connect(sceneTone);
-        o.start();
-      },
-    );
+    const roomSend = ctx.createGain();
+    roomSend.gain.value = 0.25;
+    this.sceneGain.connect(roomSend).connect(this.reverb);
+    fetch("/assets/audio/timeline-slow.m4a")
+      .then((r) => r.arrayBuffer())
+      .then((data) => ctx.decodeAudioData(data))
+      .then((buffer) => {
+        const src = ctx.createBufferSource();
+        src.buffer = buffer;
+        src.loop = true;
+        src.connect(this.sceneGain);
+        src.start();
+        this.sceneSource = src;
+      })
+      .catch(() => {});
     if (this.sceneOn) {
       this.sceneOn = false;
       this.scene(true);
