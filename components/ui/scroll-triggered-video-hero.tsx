@@ -75,7 +75,15 @@ const ChapterBackgrounds = ({ chapters, current }: { chapters: Chapter[]; curren
   </div>
 );
 
-export default function CinematicScroll({ chapters, className }: { chapters: Chapter[]; className?: string }) {
+export default function CinematicScroll({
+  chapters,
+  className,
+  style,
+}: {
+  chapters: Chapter[];
+  className?: string;
+  style?: CSSProperties;
+}) {
   const containerRef = useRef<HTMLElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -88,7 +96,7 @@ export default function CinematicScroll({ chapters, className }: { chapters: Cha
   }, [scrollYProgress, chapters.length]);
 
   return (
-    <section ref={containerRef} className={`relative w-full ${className ?? ""}`} style={{ height: `${chapters.length * 100}svh` }}>
+    <section ref={containerRef} className={`relative w-full ${className ?? ""}`} style={{ height: `${chapters.length * 100}svh`, ...style }}>
       <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
         <ChapterBackgrounds chapters={chapters} current={activeIndex} />
       </div>

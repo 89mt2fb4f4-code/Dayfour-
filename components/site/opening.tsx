@@ -54,7 +54,7 @@ function LogoIntro({ onDone }: { onDone: () => void }) {
     }
     const start = () => {
       video.play().then(
-        () => getSound().swell(6),
+        () => getSound().hit(),
         () => {
           // Autoplay refused (e.g. iOS low power mode): hold the final frame instead.
           setStill(true);

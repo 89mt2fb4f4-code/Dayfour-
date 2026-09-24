@@ -36,5 +36,13 @@ const chapters: Chapter[] = [
 ];
 
 export default function About() {
-  return <CinematicScroll chapters={chapters} />;
+  // Overlaps the moving footage above and fades in over it, so there is no edge.
+  const feather = "linear-gradient(to bottom, transparent 0, #000 40svh)";
+  return (
+    <CinematicScroll
+      chapters={chapters}
+      className="-mt-[40svh]"
+      style={{ maskImage: feather, WebkitMaskImage: feather }}
+    />
+  );
 }
