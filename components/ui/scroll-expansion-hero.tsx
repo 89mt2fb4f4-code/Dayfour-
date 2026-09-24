@@ -22,6 +22,8 @@ interface ExpandSceneProps {
   bgImageSrc: string;
   /** Two lines that slide apart as the media expands. */
   titleLines?: [string, string];
+  /** Small red caption beside the title. */
+  caption?: string;
   /** Eased progress, and the raw scroll position it is gliding toward. */
   onProgress?: (progress: number, target: number) => void;
 }
@@ -32,7 +34,7 @@ const smooth = (a: number, b: number, n: number) => {
   return t * t * (3 - 2 * t);
 };
 
-export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc, bgImageSrc, titleLines, onProgress }: ExpandSceneProps) {
+export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc, bgImageSrc, titleLines, caption, onProgress }: ExpandSceneProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -42,6 +44,7 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
   const videoRef = useRef<HTMLVideoElement>(null);
   const leftRef = useRef<HTMLHeadingElement>(null);
   const rightRef = useRef<HTMLHeadingElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef(onProgress);
   progressRef.current = onProgress;
 
@@ -87,6 +90,7 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
         rightRef.current.style.transform = `translate3d(${shift}vw, 0, 0)`;
         leftRef.current.style.opacity = fade;
         rightRef.current.style.opacity = fade;
+        if (gridRef.current) gridRef.current.style.opacity = String(1 - smooth(0.05, 0.35, p));
       }
 
       // Slow video while still; the fast frames take over with the first stretch of scroll.
@@ -170,13 +174,35 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
       </div>
 
       {titleLines && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center">
-          <h2 ref={leftRef} className="font-serif text-5xl font-light tracking-[0.06em] text-white will-change-transform md:text-6xl lg:text-7xl">
-            {titleLines[0]}
-          </h2>
-          <h2 ref={rightRef} className="font-serif text-5xl font-light italic tracking-[0.06em] text-white will-change-transform md:text-6xl lg:text-7xl">
-            {titleLines[1]}
-          </h2>
+        <div className="absolute inset-0 flex items-center justify-center text-center">
+          {/* Poster-style title: tight grotesk, registered mark, thin grid lines (after the
+              Nocturna reference), with a small red caption (after the Murakami reference). */}
+          <div className="relative px-3 py-2">
+            <div ref={gridRef} aria-hidden="true" className="pointer-events-none absolute inset-0">
+              <span className="absolute -left-[100vw] -right-[100vw] top-0 h-px bg-white/30" />
+              <span className="absolute -left-[100vw] -right-[100vw] bottom-0 h-px bg-white/30" />
+              <span className="absolute -bottom-[100svh] -top-[100svh] left-0 w-px bg-white/30" />
+              <span className="absolute -bottom-[100svh] -top-[100svh] right-0 w-px bg-white/30" />
+              {caption && (
+                <p className="absolute -top-7 right-0 text-right font-mono text-[9px] uppercase leading-[1.2] tracking-[0.02em] text-[#e0352b]">
+                  {caption}
+                </p>
+              )}
+            </div>
+            <h2
+              ref={leftRef}
+              className="font-sans text-[3.25rem] font-medium leading-[0.95] tracking-[-0.055em] text-[#e9e9e6] will-change-transform md:text-7xl"
+            >
+              {titleLines[0]}
+            </h2>
+            <h2
+              ref={rightRef}
+              className="font-sans text-[3.25rem] font-medium leading-[0.95] tracking-[-0.055em] text-[#e9e9e6] will-change-transform md:text-7xl"
+            >
+              {titleLines[1]}
+              <sup className="ml-0.5 align-super text-[0.38em] font-normal tracking-normal">®</sup>
+            </h2>
+          </div>
         </div>
       )}
 

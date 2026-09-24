@@ -147,6 +147,7 @@ export default function Opening() {
                 posterSrc="/assets/img/timeline-poster.jpg"
                 bgImageSrc="/assets/img/intro-frame-bg.png"
                 titleLines={["We don’t", "do normal"]}
+                caption="Visual aesthetic"
                 onProgress={(p, target) => {
                   getSound().rise(p);
                   // Full-bleed: hand over to the identical footage window underneath, so the

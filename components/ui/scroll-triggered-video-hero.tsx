@@ -96,14 +96,14 @@ export default function CinematicScroll({
   }, [scrollYProgress, chapters.length]);
 
   return (
-    <section ref={containerRef} className={`relative w-full ${className ?? ""}`} style={{ height: `${chapters.length * 100}svh`, ...style }}>
+    <section ref={containerRef} className={`relative w-full ${className ?? ""}`} style={{ height: `${chapters.length * 62 + 38}svh`, ...style }}>
       <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
         <ChapterBackgrounds chapters={chapters} current={activeIndex} />
       </div>
 
       <div className="pointer-events-none absolute inset-0 z-30">
         {chapters.map((chapter) => (
-          <div key={chapter.id} className="relative flex h-[100svh] w-full items-center px-6 md:px-24">
+          <div key={chapter.id} className="relative flex h-[62svh] w-full items-center px-6 md:px-24">
             {chapter.render ? (
               chapter.render()
             ) : (
