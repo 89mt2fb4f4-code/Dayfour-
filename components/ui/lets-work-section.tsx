@@ -2,12 +2,14 @@
 
 /*
  * Adapted from 21st.dev "Let's work together".
- * Changes for DAYFOUR: the booking link opens the studio's Instagram DM, the status
- * dot is white, no calendar icon or email (private by design), serif headline.
+ * Changes for DAYFOUR: the "Let's talk" button is the Metallic Button and opens the
+ * studio's Instagram DM; the status dot is white; no calendar icon or email (private
+ * by design); serif headline; the handles sit at the foot of the section.
  */
 import type React from "react";
 import { useState } from "react";
 import { ArrowUpRight } from "lucide-react";
+import MetallicButton from "@/components/ui/metallic-button";
 
 interface LetsWorkTogetherProps {
   contactHref: string;
@@ -19,7 +21,6 @@ export function LetsWorkTogether({ contactHref, contactLabel = "Message us", not
   const [isHovered, setIsHovered] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [isButtonHovered, setIsButtonHovered] = useState(false);
 
   const handleClick = () => {
     setIsClicked(true);
@@ -27,7 +28,7 @@ export function LetsWorkTogether({ contactHref, contactLabel = "Message us", not
   };
 
   return (
-    <section id="contact" className="flex min-h-[100svh] items-center justify-center bg-black px-6">
+    <section id="contact" className="relative flex min-h-[100svh] items-center justify-center bg-black px-6">
       <div className="relative flex flex-col items-center gap-12">
         <div
           className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-8 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
@@ -52,50 +53,22 @@ export function LetsWorkTogether({ contactHref, contactLabel = "Message us", not
             </h3>
           </div>
 
-          <a
-            href={contactHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            onMouseEnter={() => setIsButtonHovered(true)}
-            onMouseLeave={() => setIsButtonHovered(false)}
-            className="group relative flex items-center gap-4 transition-all duration-500"
+          {/* The call to action is the metallic button (combined component). */}
+          <div
+            className="transition-all duration-500"
             style={{
-              transform: showSuccess ? (isButtonHovered ? "translateY(0) scale(1.02)" : "translateY(0) scale(1)") : "translateY(15px) scale(1)",
+              transform: showSuccess ? "translateY(0)" : "translateY(15px)",
               opacity: showSuccess ? 1 : 0,
               transitionDelay: "150ms",
             }}
           >
-            <div
-              className="h-px w-8 bg-border transition-all duration-500 sm:w-12"
-              style={{ transform: isButtonHovered ? "scaleX(0)" : "scaleX(1)", opacity: isButtonHovered ? 0 : 0.5 }}
+            <MetallicButton
+              label={contactLabel}
+              redFringe={0}
+              blueFringe={0}
+              onClick={() => window.open(contactHref, "_blank", "noopener,noreferrer")}
             />
-            <div
-              className="relative flex items-center gap-3 overflow-hidden rounded-full border px-6 py-3 transition-all duration-500 sm:px-8 sm:py-4"
-              style={{
-                borderColor: isButtonHovered ? "var(--foreground)" : "var(--border)",
-                backgroundColor: isButtonHovered ? "var(--foreground)" : "transparent",
-              }}
-            >
-              <span
-                className="text-sm font-medium tracking-wide transition-all duration-500 sm:text-base"
-                style={{ color: isButtonHovered ? "var(--background)" : "var(--foreground)" }}
-              >
-                {contactLabel}
-              </span>
-              <ArrowUpRight
-                className="size-4 transition-all duration-500 sm:size-5"
-                strokeWidth={1.5}
-                style={{
-                  color: isButtonHovered ? "var(--background)" : "var(--foreground)",
-                  transform: isButtonHovered ? "translate(3px, -3px) scale(1.1)" : "translate(0, 0) scale(1)",
-                }}
-              />
-            </div>
-            <div
-              className="h-px w-8 bg-border transition-all duration-500 sm:w-12"
-              style={{ transform: isButtonHovered ? "scaleX(0)" : "scaleX(1)", opacity: isButtonHovered ? 0 : 0.5 }}
-            />
-          </a>
+          </div>
 
           <span
             className="font-serif text-base italic text-muted-foreground transition-all duration-500"
@@ -198,6 +171,14 @@ export function LetsWorkTogether({ contactHref, contactLabel = "Message us", not
             Have a vision? Tell us about it. Not everyone. The right ones.
           </p>
         </div>
+      </div>
+
+      <div
+        className="absolute inset-x-0 space-y-1 text-center font-sans text-xs font-light tracking-[0.08em] text-df-grey-light"
+        style={{ bottom: "calc(56px + env(safe-area-inset-bottom, 0px))" }}
+      >
+        <p>@dayfour.studio</p>
+        <p>@god.kagari</p>
       </div>
     </section>
   );

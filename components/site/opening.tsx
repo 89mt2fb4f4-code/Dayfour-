@@ -1,13 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import GlyphPortal from "@/components/ui/glyph-portal";
-import ScrollExpandMedia from "@/components/ui/scroll-expansion-hero";
+import ExpandScene from "@/components/ui/scroll-expansion-hero";
+import FootageWindow from "@/components/ui/davincho-hero";
 import { getSound } from "@/lib/sound";
 
 const WORD = "DɅYFOVR";
 const PORTAL_FONT = '"Cormorant Garamond", Garamond, serif';
-const FAST_FRAMES = { count: 96, src: (i: number) => `/assets/frames/fast/${String(i).padStart(3, "0")}.jpg` };
+const smooth = (a: number, b: number, n: number) => {
+  const t = Math.min(1, Math.max(0, (n - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+};
 
 /** Blocks scrolling while the logo plays. No skip: the wait is intentional. */
 function useScrollLock(locked: boolean) {
@@ -96,6 +100,8 @@ function LogoIntro({ onDone }: { onDone: () => void }) {
 export default function Opening() {
   const [introDone, setIntroDone] = useState(false);
   const [fontReady, setFontReady] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   useScrollLock(!introDone);
   const endIntro = useCallback(() => setIntroDone(true), []);
 
@@ -108,11 +114,20 @@ export default function Opening() {
     return () => clearTimeout(t);
   }, []);
 
+  // The word is solid white, and turns into the scene as the camera goes through the D.
+  const onPortal = useCallback((p: number) => {
+    wrapRef.current?.style.setProperty("--word-white", String(1 - smooth(0.06, 0.6, p)));
+  }, []);
+
   return (
     <>
       <LogoIntro onDone={endIntro} />
 
-      <div className="transition-opacity delay-500 duration-[1600ms]" style={{ opacity: introDone ? 1 : 0 }}>
+      <div
+        ref={wrapRef}
+        className="relative z-10 transition-opacity delay-500 duration-[1600ms]"
+        style={{ opacity: introDone ? 1 : 0, "--word-white": 1 } as CSSProperties}
+      >
         {fontReady ? (
           <GlyphPortal
             word={WORD}
@@ -123,39 +138,35 @@ export default function Opening() {
             scrollLength={2.6}
             className="dayfour-portal"
             style={{ "--gp-paper": "#000", "--gp-ink": "#fff", "--gp-field": "#000", "--gp-foreground": "#fff" }}
+            onProgress={onPortal}
             background={
-              <video
-                src="/assets/video/timeline-slow.mp4"
-                poster="/assets/img/timeline-poster.jpg"
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="absolute inset-0 h-full w-full object-cover"
-                style={{
-                  transform: "scale(var(--gp-field-scale,1))",
-                  // Brighter while it is only a word on black; normal once the camera is inside.
-                  filter: "brightness(calc(1 + 1.6 * var(--gp-caption, 1))) contrast(1.05)",
+              <ExpandScene
+                trackRef={trackRef}
+                mediaSrc="/assets/video/timeline-slow.mp4"
+                mediaSrcAlt="/assets/video/timeline-slow.webm"
+                posterSrc="/assets/img/timeline-poster.jpg"
+                bgImageSrc="/assets/img/intro-frame-bg.png"
+                titleLines={["We don’t", "do normal"]}
+                onProgress={(p) => {
+                  getSound().rise(p);
+                  // Full-bleed: hand over to the identical footage window underneath, so the
+                  // footage never slides when the pinned scene lets go.
+                  if (wrapRef.current) wrapRef.current.style.visibility = p >= 0.999 ? "hidden" : "";
                 }}
               />
             }
           >
-            <div />
+            {/* Scroll room for the expansion, which plays while the portal stays pinned. */}
+            <div ref={trackRef} className="h-[260svh]" />
           </GlyphPortal>
         ) : (
           <div className="h-[100svh]" />
         )}
       </div>
 
-      <ScrollExpandMedia
-        mediaSrc="/assets/video/timeline-slow.mp4"
-        mediaSrcAlt="/assets/video/timeline-slow.webm"
-        posterSrc="/assets/img/timeline-poster.jpg"
-        bgImageSrc="/assets/img/intro-frame-bg.png"
-        titleLines={["We don’t", "do normal"]}
-        frames={FAST_FRAMES}
-        onProgress={(p) => getSound().rise(p)}
-      />
+      {/* The footage keeps running while the next section slides over it. It sits under
+          the end of the opening so the swap is invisible. */}
+      <FootageWindow className="-mt-[calc(100svh+120px)]" />
     </>
   );
 }

@@ -3,30 +3,25 @@
 /*
  * Adapted from 21st.dev "Scroll media expansion hero" (arunachalam).
  * Changes for DAYFOUR:
- *  - Driven by normal page scroll (sticky), not by hijacking wheel/touch events,
- *    so it hands off cleanly from the section above and to the one below.
- *  - The media is a slow looping video that gives way to a frame sequence
- *    scrubbed by the scroll (the fast timeline), so speed builds as it expands.
+ *  - It is a scene, not a section: it lives inside the Glyph Portal's letter, so the
+ *    zoom through the D lands straight on this frame. It reads its progress from a
+ *    scroll track element (`trackRef`) instead of hijacking wheel/touch events.
+ *  - The box holds the slow timeline while still; the scroll scrubs the fast
+ *    timeline frames as it expands. Once full-bleed, the fast footage keeps running.
  *  - Square corners, white type, ends full-bleed.
  */
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, type RefObject } from "react";
+import { drawFrame, frameAt, loadFastFrames, loopIndex, scrubIndex, setLooping } from "@/lib/fast-frames";
 
-interface FrameSequence {
-  count: number;
-  src: (index: number) => string;
-}
-
-interface ScrollExpandMediaProps {
+interface ExpandSceneProps {
+  trackRef: RefObject<HTMLElement | null>;
   mediaSrc: string;
   mediaSrcAlt?: string;
   posterSrc?: string;
   bgImageSrc: string;
   /** Two lines that slide apart as the media expands. */
   titleLines?: [string, string];
-  frames?: FrameSequence;
-  textBlend?: boolean;
   onProgress?: (progress: number) => void;
-  children?: ReactNode;
 }
 
 const clamp = (n: number, a = 0, b = 1) => Math.min(b, Math.max(a, n));
@@ -35,18 +30,8 @@ const smooth = (a: number, b: number, n: number) => {
   return t * t * (3 - 2 * t);
 };
 
-export default function ScrollExpandMedia({
-  mediaSrc,
-  mediaSrcAlt,
-  posterSrc,
-  bgImageSrc,
-  titleLines,
-  frames,
-  textBlend,
-  onProgress,
-  children,
-}: ScrollExpandMediaProps) {
-  const sectionRef = useRef<HTMLElement>(null);
+export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc, bgImageSrc, titleLines, onProgress }: ExpandSceneProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const shadeRef = useRef<HTMLDivElement>(null);
@@ -58,46 +43,21 @@ export default function ScrollExpandMedia({
   progressRef.current = onProgress;
 
   useEffect(() => {
-    const section = sectionRef.current!;
     const canvas = canvasRef.current!;
-    const ctx = canvas.getContext("2d");
-    const images: HTMLImageElement[] = [];
     let raf = 0;
-    let lastFrame = -1;
     let lastP = -1;
+    let lastFrame = -1;
+    let visible = true;
+    loadFastFrames();
 
-    const load = () => {
-      if (!frames || images.length) return;
-      for (let i = 0; i < frames.count; i++) {
-        const img = new Image();
-        img.decoding = "async";
-        img.src = frames.src(i);
-        images.push(img);
-      }
-    };
-
-    const drawFrame = (p: number) => {
-      if (!frames || !ctx) return;
-      let i = Math.round(smooth(0.06, 1, p) * (frames.count - 1));
-      while (i > 0 && !(images[i]?.complete && images[i].naturalWidth)) i--;
-      const img = images[i];
-      if (!img?.naturalWidth || i === lastFrame) return;
-      lastFrame = i;
-      if (canvas.width !== img.naturalWidth) {
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-      }
-      ctx.drawImage(img, 0, 0);
-    };
-
-    const render = () => {
+    const paint = () => {
       raf = 0;
+      const track = trackRef.current;
+      if (!track || !visible) return;
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const rect = section.getBoundingClientRect();
-      // The expansion runs over the pinned stretch; any extra height is for children.
-      const pinned = section.querySelector<HTMLElement>("[data-sem-track]")!.offsetHeight - vh;
-      const p = clamp(-rect.top / Math.max(1, pinned));
+      const rect = track.getBoundingClientRect();
+      const p = clamp(-rect.top / Math.max(1, rect.height - vh));
       const mobile = vw < 768;
 
       const startW = Math.min(300, vw * 0.78);
@@ -106,101 +66,105 @@ export default function ScrollExpandMedia({
       boxRef.current!.style.width = `${startW + (vw - startW) * e}px`;
       boxRef.current!.style.height = `${startH + (vh - startH) * e}px`;
       bgRef.current!.style.opacity = String(1 - p);
-      shadeRef.current!.style.opacity = String(0.5 - p * 0.3);
+      shadeRef.current!.style.opacity = String(0.4 - p * 0.3);
 
-      const shift = p * (mobile ? 180 : 150);
-      const fade = String(1 - smooth(0.55, 0.85, p));
-      leftRef.current!.style.transform = `translateX(-${shift}vw)`;
-      rightRef.current!.style.transform = `translateX(${shift}vw)`;
-      leftRef.current!.style.opacity = fade;
-      rightRef.current!.style.opacity = fade;
+      if (leftRef.current && rightRef.current) {
+        const shift = p * (mobile ? 180 : 150);
+        const fade = String(1 - smooth(0.55, 0.85, p));
+        leftRef.current.style.transform = `translateX(-${shift}vw)`;
+        rightRef.current.style.transform = `translateX(${shift}vw)`;
+        leftRef.current.style.opacity = fade;
+        rightRef.current.style.opacity = fade;
+      }
 
-      canvas.style.opacity = String(smooth(0.03, 0.14, p));
-      drawFrame(p);
+      // Slow video while still; the fast frames take over with the first stretch of scroll.
+      canvas.style.opacity = String(smooth(0.02, 0.1, p));
+      const done = p >= 0.995;
+      setLooping(done);
+      const index = done ? loopIndex() : scrubIndex(smooth(0.04, 1, p));
+      const img = frameAt(index);
+      if (img && index !== lastFrame) {
+        lastFrame = index;
+        drawFrame(canvas, img);
+      }
 
       if (p !== lastP) {
         lastP = p;
         progressRef.current?.(p);
       }
+      // Keep the footage moving once it is full-bleed, even without scrolling.
+      if (done) raf = requestAnimationFrame(paint);
     };
 
     const schedule = () => {
-      if (!raf) raf = requestAnimationFrame(render);
+      if (!raf) raf = requestAnimationFrame(paint);
     };
 
-    const near = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          load();
-          void videoRef.current?.play().catch(() => {});
-        } else {
-          videoRef.current?.pause();
-        }
-      },
-      { rootMargin: "150% 0px" },
-    );
-    near.observe(section);
+    const seen = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible) {
+        void videoRef.current?.play().catch(() => {});
+        schedule();
+      } else {
+        videoRef.current?.pause();
+      }
+    });
+    seen.observe(rootRef.current!);
     addEventListener("scroll", schedule, { passive: true });
     addEventListener("resize", schedule);
-    render();
+    schedule();
     return () => {
       cancelAnimationFrame(raf);
-      near.disconnect();
+      seen.disconnect();
       removeEventListener("scroll", schedule);
       removeEventListener("resize", schedule);
     };
-  }, [frames]);
+  }, [trackRef]);
 
   return (
-    <section ref={sectionRef} className="relative">
-      <div data-sem-track className="relative h-[280svh]">
-        <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
-          <div ref={bgRef} className="absolute inset-0 z-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={bgImageSrc} alt="" className="h-full w-full object-cover object-center" />
-            <div className="absolute inset-0 bg-black/10" />
-          </div>
-
-          <div
-            ref={boxRef}
-            className="absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2 overflow-hidden"
-            style={{ width: 300, height: 400, boxShadow: "0px 0px 50px rgba(0, 0, 0, 0.3)" }}
-          >
-            <video
-              ref={videoRef}
-              poster={posterSrc}
-              muted
-              loop
-              playsInline
-              preload="auto"
-              className="absolute inset-0 h-full w-full object-cover"
-              disablePictureInPicture
-              disableRemotePlayback
-            >
-              <source src={mediaSrc} type="video/mp4" />
-              {mediaSrcAlt && <source src={mediaSrcAlt} type="video/webm" />}
-            </video>
-            <canvas ref={canvasRef} className="absolute inset-0 h-full w-full object-cover opacity-0" />
-            <div ref={shadeRef} className="absolute inset-0 bg-black/30" />
-          </div>
-
-          {titleLines && (
-            <div
-              className={`relative z-10 flex h-full w-full flex-col items-center justify-center gap-2 text-center ${
-                textBlend ? "mix-blend-difference" : ""
-              }`}
-            >
-              <h2 ref={leftRef} className="font-serif text-5xl font-light tracking-[0.06em] text-white will-change-transform md:text-6xl lg:text-7xl">
-                {titleLines[0]}
-              </h2>
-              <h2 ref={rightRef} className="font-serif text-5xl font-light italic tracking-[0.06em] text-white will-change-transform md:text-6xl lg:text-7xl">
-                {titleLines[1]}
-              </h2>
-            </div>
-          )}
-        </div>
+    <div ref={rootRef} className="absolute inset-0 overflow-hidden bg-black">
+      <div ref={bgRef} className="absolute inset-0">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={bgImageSrc} alt="" className="h-full w-full object-cover object-center" />
       </div>
-      {children}
-    </section>
+
+      <div
+        ref={boxRef}
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden"
+        style={{ width: 300, height: 400, boxShadow: "0px 0px 50px rgba(0, 0, 0, 0.3)" }}
+      >
+        <video
+          ref={videoRef}
+          poster={posterSrc}
+          muted
+          loop
+          playsInline
+          autoPlay
+          preload="auto"
+          className="absolute inset-0 h-full w-full object-cover"
+          disablePictureInPicture
+          disableRemotePlayback
+        >
+          <source src={mediaSrc} type="video/mp4" />
+          {mediaSrcAlt && <source src={mediaSrcAlt} type="video/webm" />}
+        </video>
+        <canvas ref={canvasRef} className="absolute inset-0 h-full w-full object-cover opacity-0" />
+        <div ref={shadeRef} className="absolute inset-0 bg-black/30" />
+      </div>
+
+      {titleLines && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center">
+          <h2 ref={leftRef} className="font-serif text-5xl font-light tracking-[0.06em] text-white will-change-transform md:text-6xl lg:text-7xl">
+            {titleLines[0]}
+          </h2>
+          <h2 ref={rightRef} className="font-serif text-5xl font-light italic tracking-[0.06em] text-white will-change-transform md:text-6xl lg:text-7xl">
+            {titleLines[1]}
+          </h2>
+        </div>
+      )}
+
+      {/* Solid white while the scene is only seen through the letters; fades as the camera enters. */}
+      <div className="pointer-events-none absolute inset-0 bg-white" style={{ opacity: "var(--word-white, 0)" }} />
+    </div>
   );
 }

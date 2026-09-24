@@ -1,7 +1,6 @@
 import Opening from "@/components/site/opening";
 import About from "@/components/site/about";
 import Work from "@/components/site/work";
-import Footer from "@/components/site/footer";
 import SoundToggle from "@/components/site/sound-toggle";
 import { LetsWorkTogether } from "@/components/ui/lets-work-section";
 import { INSTAGRAM_DM } from "@/lib/links";
@@ -14,7 +13,6 @@ export default function Home() {
       <About />
       <Work />
       <LetsWorkTogether contactHref={INSTAGRAM_DM} />
-      <Footer />
       <SoundToggle />
     </main>
   );

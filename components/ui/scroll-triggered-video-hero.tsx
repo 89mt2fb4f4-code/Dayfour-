@@ -5,8 +5,9 @@
  * Changes for DAYFOUR:
  *  - Chapters come in as props. Each can have a video or a CSS background
  *    (the about section uses grey, grainy gradients after the EVOLVE poster).
- *  - Chapter numbers, the indigo accents, the glass text box, the button and the
- *    floating progress pill are removed. Type is white, condensed and poster-sized.
+ *  - Kept: header line, masked title reveal, the frosted glass text box.
+ *  - Removed: chapter numbers, the indigo accents, the button and the floating
+ *    progress pill. Type is white; titles use the condensed poster face.
  *  - A chapter can render its own layout (the first one sets the title vertically).
  */
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
@@ -16,6 +17,8 @@ export interface Chapter {
   id: string;
   title: string;
   body: string;
+  /** Small label beside the header line. */
+  label?: string;
   videoUrl?: string;
   background?: string;
   /** Replaces the default heading + body layout. */
@@ -103,20 +106,28 @@ export default function CinematicScroll({ chapters, className }: { chapters: Cha
                 viewport={{ once: false, margin: "-20%" }}
                 className="pointer-events-auto max-w-4xl"
               >
-                <div className="mb-6 overflow-hidden py-1">
-                  <motion.h2
-                    variants={textReveal}
-                    className="font-poster text-[15vw] uppercase leading-[0.92] text-white md:text-8xl"
-                  >
+                {/* Header line */}
+                <motion.div variants={fadeIn} className="mb-6 flex items-center gap-4">
+                  <div className="h-0.5 w-12 bg-white" />
+                  {chapter.label && (
+                    <span className="font-sans text-xs font-medium uppercase tracking-[0.3em] text-white/70">{chapter.label}</span>
+                  )}
+                </motion.div>
+
+                {/* Masked title reveal */}
+                <div className="mb-6 overflow-hidden py-2">
+                  <motion.h2 variants={textReveal} className="font-poster text-5xl uppercase leading-[0.95] text-white md:text-7xl">
                     {chapter.title}
                   </motion.h2>
                 </div>
-                <motion.p
+
+                {/* Description box */}
+                <motion.div
                   variants={fadeIn}
-                  className="max-w-[30ch] font-condensed text-lg font-light leading-snug tracking-[0.02em] text-white/90"
+                  className="max-w-md rounded-2xl border border-white/10 bg-white/5 p-6 shadow-2xl backdrop-blur-md"
                 >
-                  {chapter.body}
-                </motion.p>
+                  <p className="font-sans text-lg font-light leading-relaxed text-white/80">{chapter.body}</p>
+                </motion.div>
               </motion.div>
             )}
           </div>
