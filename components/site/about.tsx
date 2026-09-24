@@ -39,10 +39,12 @@ export default function About() {
   // Overlaps the moving footage above and fades in over it, so there is no edge.
   const feather = "linear-gradient(to bottom, transparent 0, #000 30svh)";
   return (
+    <div id="about">
     <CinematicScroll
       chapters={chapters}
       className="-mt-[30svh]"
       style={{ maskImage: feather, WebkitMaskImage: feather }}
     />
+    </div>
   );
 }

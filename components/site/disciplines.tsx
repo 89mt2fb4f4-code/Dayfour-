@@ -11,7 +11,7 @@ export default function Disciplines() {
     { text: "Documentary", bold: true },
   ];
   return (
-    <section aria-label="What we make" className="relative flex h-[72svh] items-center justify-center overflow-hidden bg-black px-6">
+    <section id="what-we-make" aria-label="What we make" className="relative flex h-[72svh] items-center justify-center overflow-hidden bg-black px-6">
       <Crosshairs seed={23} count={6} />
       <motion.div
         initial="hidden"

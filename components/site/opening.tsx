@@ -5,6 +5,7 @@ import GlyphPortal from "@/components/ui/glyph-portal";
 import ExpandScene from "@/components/ui/scroll-expansion-hero";
 import FootageWindow from "@/components/ui/davincho-hero";
 import { getSound } from "@/lib/sound";
+import { INTRO_DONE_EVENT } from "@/components/ui/hero-01-utils/header";
 
 const WORD = "DɅYFOVR";
 const PORTAL_FONT = '"Cormorant Garamond", Garamond, serif';
@@ -103,7 +104,10 @@ export default function Opening() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   useScrollLock(!introDone);
-  const endIntro = useCallback(() => setIntroDone(true), []);
+  const endIntro = useCallback(() => {
+    setIntroDone(true);
+    dispatchEvent(new Event(INTRO_DONE_EVENT));
+  }, []);
 
   useEffect(() => {
     // The portal measures its own ink, so its face has to be loaded before it mounts.

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 /* Fonts are self-hosted from /public/fonts. Cormorant and Anton carry an added Ʌ
    (a flipped V) so the DɅYFOVR wordmark sets in one face. */
