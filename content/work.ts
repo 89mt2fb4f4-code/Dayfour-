@@ -15,10 +15,4 @@ export type Project = {
   cover?: string;
 };
 
-// TEMPORARY SAMPLES so the work section can be previewed. Blender open films, not DAYFOUR work.
-// To remove: set this back to `export const projects: Project[] = [];`
-export const projects: Project[] = [
-  { id: "sample-sintel", title: "Sintel", meta: "Sample. Short film.", youtubeUrl: "https://www.youtube.com/watch?v=eRsGyueVLvQ" },
-  { id: "sample-tears-of-steel", title: "Tears of Steel", meta: "Sample. Short film.", youtubeUrl: "https://www.youtube.com/watch?v=R6MlUcmOul8" },
-  { id: "sample-big-buck-bunny", title: "Big Buck Bunny", meta: "Sample. Short film.", youtubeUrl: "https://www.youtube.com/watch?v=aqz-KE-bpKQ" },
-];
+export const projects: Project[] = [];

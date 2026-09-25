@@ -6,7 +6,7 @@ const SHARE_IMAGE = { url: "/og.jpg", width: 1200, height: 630, alt: "DɅYFOVR" 
 
 export const metadata: Metadata = {
   // Share cards need absolute image links; this is the live address.
-  metadataBase: new URL("https://my-dayfour.vercel.app"),
+  metadataBase: new URL("https://dayfour.studio"),
   title: "DɅYFOVR",
   description: DESCRIPTION,
   openGraph: {
