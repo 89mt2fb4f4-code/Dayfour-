@@ -108,7 +108,7 @@ export default function Timeline({
       if (!section) return;
       const isMobile = window.innerWidth < 600;
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: section, start: "top top", end: isMobile ? "82% 50%" : "92% bottom", scrub: true, invalidateOnRefresh: true },
+        scrollTrigger: { trigger: section, start: "top top", end: isMobile ? "bottom 125%" : "92% bottom", scrub: true, invalidateOnRefresh: true },
         defaults: { ease: "none" },
       });
       // Slide until the right edge of the last card reaches the screen edge (measured, so
@@ -136,7 +136,7 @@ export default function Timeline({
         scrollTrigger: {
           trigger: section,
           start: isMobile ? "top 30%" : "top 25%",
-          end: isMobile ? "80% 50%" : "92% bottom",
+          end: isMobile ? "bottom 125%" : "92% bottom",
           scrub: true,
         },
       });
@@ -230,7 +230,7 @@ export default function Timeline({
       ref={sectionRef}
       id="work"
       className="relative w-full"
-      style={{ color: textColor, backgroundColor, height: `max(200vw, ${120 + count * 70}vh)` }}
+      style={{ color: textColor, backgroundColor, height: `max(200vw, ${Math.max(230, 150 + count * 70)}vh)` }}
     >
       <div className="sticky top-0 h-[100svh] w-screen overflow-hidden pt-[10%] max-[600px]:pt-[12svh]">
         <div

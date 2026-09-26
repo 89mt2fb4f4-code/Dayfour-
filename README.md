@@ -24,14 +24,12 @@ Sound is synthesized in `lib/sound.ts` and starts on the visitor's first tap (br
 
 ## Adding work
 
-Until the Sanity admin is connected, add projects to `content/work.ts`:
+Projects are added in the admin at **dayfour.studio/studio** (Sanity). Publishing there shows on
+the site within about a minute, with no rebuild. Setup: create a free project at sanity.io/manage,
+put its ID in `sanity/env.ts`, and add `https://dayfour.studio` (credentials allowed) under
+API → CORS origins.
 
-```ts
-export const projects: Project[] = [
-  { id: "kidsuper-nyfw", title: "KidSuper NYFW", meta: "Fashion. New York. 2026.",
-    youtubeUrl: "https://youtu.be/VIDEO_ID" },
-];
-```
+Projects can also live in code in `content/work.ts`; they show after the admin's.
 
 ## Assets
 
@@ -44,4 +42,4 @@ export const projects: Project[] = [
 ## Deploy
 
 Hosted on Vercel (project `my-dayfour`), connected to this repo. The production branch is
-`claude/21st-server-check-klhree`: every push to it goes live at my-dayfour.vercel.app.
+`claude/21st-server-check-klhree`: every push to it goes live at dayfour.studio.

@@ -17,7 +17,7 @@ const OPEN_EVENT = "dayfour:work-open";
 interface WorkCardProps {
   id: string;
   title: string;
-  meta: string;
+  meta?: string;
   youtubeUrl: string;
   cover?: string;
   className?: string;
@@ -139,7 +139,7 @@ export function WorkCard({ id, title, meta, youtubeUrl, cover, className }: Work
             {title}
           </motion.span>
         </button>
-        <p className="font-sans text-xs font-light text-df-grey-light">{meta}</p>
+        {meta && <p className="font-sans text-xs font-light text-df-grey-light">{meta}</p>}
         <motion.div
           className="h-px bg-gradient-to-r from-white/50 via-white/25 to-transparent"
           initial={{ scaleX: 0, originX: 0 }}

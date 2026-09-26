@@ -2,7 +2,10 @@
 
 import Timeline from "@/components/ui/timeline";
 import { WorkCard } from "@/components/ui/expand-map";
-import { projects } from "@/content/work";
+import { useEffect, useState } from "react";
+import { projects as localProjects, type Project } from "@/content/work";
+import { fetchCmsProjects } from "@/lib/cms";
+import { youtubeId } from "@/lib/youtube";
 import Crosshairs from "@/components/ui/crosshairs";
 
 /** Shown while there is no work to list. Type after the angled "Coming soon" screen reference. */
@@ -66,7 +69,25 @@ function ComingSoon() {
   );
 }
 
+/** Admin projects first, then the ones in content/work.ts that aren't already there. */
+function useProjects() {
+  const [projects, setProjects] = useState<Project[]>(localProjects);
+  useEffect(() => {
+    let live = true;
+    fetchCmsProjects().then((cms) => {
+      if (!live || !cms) return;
+      const seen = new Set(cms.map((p) => youtubeId(p.youtubeUrl)));
+      setProjects([...cms, ...localProjects.filter((p) => !seen.has(youtubeId(p.youtubeUrl)))]);
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
+  return projects;
+}
+
 export default function Work() {
+  const projects = useProjects();
   if (!projects.length) return <ComingSoon />;
   return (
     <Timeline
@@ -79,7 +100,7 @@ export default function Work() {
       items={projects.map((p) => ({
         id: p.id,
         title: p.title,
-        content: p.meta,
+        content: p.meta ?? "",
         media: <WorkCard id={p.id} title={p.title} meta={p.meta} youtubeUrl={p.youtubeUrl} cover={p.cover} />,
       }))}
     />
