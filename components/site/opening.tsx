@@ -80,19 +80,25 @@ function LogoIntro({ onDone }: { onDone: () => void }) {
       className="fixed inset-0 z-50 overflow-hidden bg-black transition-opacity duration-[1200ms] ease-out"
       style={{ opacity: fading ? 0 : 1 }}
     >
-      {/* The logo sits in the middle ~29% of the 16:9 render; scale it to fill a phone's width. */}
-      <div className="absolute left-1/2 top-1/2 aspect-video -translate-x-1/2 -translate-y-1/2" style={{ width: "min(317vw, 177.8svh)" }}>
-        <video data-logo-intro muted playsInline preload="auto" className="h-full w-full" style={{ opacity: still ? 0 : 1 }}>
+      {/* Upright screens play the 9:16 render, which already fills a phone's width. Wide screens
+          play the 16:9 render, whose logo sits in the middle ~29%, scaled up to fill the frame. */}
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 portrait:inset-0 portrait:translate-x-0 portrait:translate-y-0 landscape:aspect-video landscape:w-[min(317vw,177.8svh)]">
+        <video data-logo-intro muted playsInline preload="auto" className="h-full w-full object-contain" style={{ opacity: still ? 0 : 1 }}>
+          <source src="/assets/video/logo-v.mp4" type="video/mp4" media="(orientation: portrait)" />
+          <source src="/assets/video/logo-v.webm" type="video/webm" media="(orientation: portrait)" />
           <source src="/assets/video/logo.mp4" type="video/mp4" />
           <source src="/assets/video/logo.webm" type="video/webm" />
         </video>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/assets/img/logo-end.jpg"
-          alt=""
-          className="absolute inset-0 h-full w-full transition-opacity duration-[2000ms]"
-          style={{ opacity: still ? 1 : 0 }}
-        />
+        <picture>
+          <source srcSet="/assets/img/logo-end-v.jpg" media="(orientation: portrait)" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/assets/img/logo-end.jpg"
+            alt=""
+            className="absolute inset-0 h-full w-full object-contain transition-opacity duration-[2000ms]"
+            style={{ opacity: still ? 1 : 0 }}
+          />
+        </picture>
       </div>
     </div>
   );
@@ -149,6 +155,11 @@ export default function Opening() {
                 mediaSrc="/assets/video/timeline-slow.mp4"
                 mediaSrcAlt="/assets/video/timeline-slow.webm"
                 posterSrc="/assets/img/timeline-poster.jpg"
+                portrait={{
+                  mediaSrc: "/assets/video/timeline-slow-v.mp4",
+                  mediaSrcAlt: "/assets/video/timeline-slow-v.webm",
+                  posterSrc: "/assets/img/timeline-poster-v.jpg",
+                }}
                 bgImageSrc="/assets/img/intro-frame-bg.jpg"
                 titleLines={["We don’t", "do normal"]}
                 caption="Visual aesthetic"

@@ -33,8 +33,9 @@ Projects can also live in code in `content/work.ts`; they show after the admin's
 
 ## Assets
 
-- `public/assets/video/`: logo render and slow timeline (24fps).
-- `public/assets/frames/fast/`: 96 frames of the fast timeline, scrubbed by scroll.
+- `public/assets/video/`: logo render and slow timeline (24fps). `-v` files are the 9:16 versions,
+  used on upright screens (phones); the others are 16:9, used on wide screens.
+- `public/assets/frames/fast/` (16:9) and `fast-v/` (9:16): 96 frames of the fast timeline, scrubbed by scroll.
 - `public/fonts/`: self-hosted fonts. Cormorant Garamond and Anton have an added Ʌ glyph (a flipped V)
   so the wordmark sets in one face.
 - `docs/brand.md`, `docs/references/`: brand rules and design references.

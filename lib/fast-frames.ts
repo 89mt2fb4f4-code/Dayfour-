@@ -1,7 +1,7 @@
 "use client";
 
 /*
- * The fast timeline, as 96 frames. Loaded once and shared, so the expanding
+ * The fast timeline, as 96 frames: 9:16 on upright screens (fast-v), 16:9 on wide ones (fast). Loaded once and shared, so the expanding
  * scene and the window below it draw the very same frame at the same moment.
  */
 const COUNT = 96;
@@ -12,10 +12,11 @@ let images: HTMLImageElement[] = [];
 
 export function loadFastFrames() {
   if (images.length || typeof window === "undefined") return images;
+  const dir = matchMedia("(orientation: portrait)").matches ? "fast-v" : "fast";
   images = Array.from({ length: COUNT }, (_, i) => {
     const img = new Image();
     img.decoding = "async";
-    img.src = `/assets/frames/fast/${String(i).padStart(3, "0")}.webp`;
+    img.src = `/assets/frames/${dir}/${String(i).padStart(3, "0")}.webp`;
     return img;
   });
   return images;

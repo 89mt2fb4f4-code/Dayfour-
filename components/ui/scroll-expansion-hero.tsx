@@ -10,7 +10,7 @@
  *    timeline frames as it expands. Once full-bleed, the fast footage keeps running.
  *  - Square corners, white type, ends full-bleed.
  */
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { drawFrame, frameAt, loadFastFrames, loopIndex, scrubIndex, setLooping } from "@/lib/fast-frames";
 import { getSound } from "@/lib/sound";
 import Crosshairs from "@/components/ui/crosshairs";
@@ -20,6 +20,8 @@ interface ExpandSceneProps {
   mediaSrc: string;
   mediaSrcAlt?: string;
   posterSrc?: string;
+  /** Upright (9:16) versions, used when the screen is taller than it is wide. */
+  portrait?: { mediaSrc: string; mediaSrcAlt?: string; posterSrc?: string };
   bgImageSrc: string;
   /** Two lines that slide apart as the media expands. */
   titleLines?: [string, string];
@@ -35,7 +37,7 @@ const smooth = (a: number, b: number, n: number) => {
   return t * t * (3 - 2 * t);
 };
 
-export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc, bgImageSrc, titleLines, caption, onProgress }: ExpandSceneProps) {
+export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc, portrait, bgImageSrc, titleLines, caption, onProgress }: ExpandSceneProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -50,6 +52,8 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
   const captionRef = useRef<HTMLParagraphElement>(null);
   const progressRef = useRef(onProgress);
   progressRef.current = onProgress;
+  // Only mounts in the browser (after the portal's font loads), so this is read once, on the client.
+  const [upright] = useState(() => typeof window !== "undefined" && matchMedia("(orientation: portrait)").matches);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -198,7 +202,7 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
         <div ref={mediaRef} className="absolute inset-0 will-change-transform">
         <video
           ref={videoRef}
-          poster={posterSrc}
+          poster={upright && portrait?.posterSrc ? portrait.posterSrc : posterSrc}
           muted
           loop
           playsInline
@@ -208,6 +212,8 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
           disablePictureInPicture
           disableRemotePlayback
         >
+          {portrait && <source src={portrait.mediaSrc} type="video/mp4" media="(orientation: portrait)" />}
+          {portrait?.mediaSrcAlt && <source src={portrait.mediaSrcAlt} type="video/webm" media="(orientation: portrait)" />}
           <source src={mediaSrc} type="video/mp4" />
           {mediaSrcAlt && <source src={mediaSrcAlt} type="video/webm" />}
         </video>
