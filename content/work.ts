@@ -8,11 +8,20 @@ export type Project = {
   title: string;
   /** One line under the title, e.g. "Fashion. New York. 2026." */
   meta?: string;
+  /** A couple of sentences under the card. */
+  description?: string;
   youtubeUrl: string;
   /** Still shown before the video plays. Defaults to YouTube's thumbnail. */
   cover?: string;
 };
 
 export const projects: Project[] = [
-  { id: "nyc", title: "NYC", youtubeUrl: "https://youtu.be/5WUmVpoOXDY", cover: "/assets/work/nyc.jpg" },
+  {
+    id: "escape",
+    title: "ESCAPE",
+    description:
+      "A deeply personal piece about leaving the familiar behind and stepping into a new world. ESCAPE renders a surreal life suspended in wonder, where the ordinary gives way to something stranger and more beautiful.",
+    youtubeUrl: "https://youtu.be/9Firu_m20hE",
+    cover: "/assets/work/escape.jpg",
+  },
 ];

@@ -248,8 +248,8 @@ export default function Timeline({
             </div>
 
             <div className="flex h-1/2 w-full items-center justify-start gap-[.5vw]">
-              <div className="h-full w-[20%] shrink-0 pt-[2vw] max-[600px]:h-fit max-[600px]:pt-[5vw]">
-                <h2 className="w-[65%] font-serif text-[3vw] font-light leading-[0.95] max-[600px]:text-[8.5vw]">{title}</h2>
+              <div className="h-full w-[20%] shrink-0 pt-[2vw] max-[600px]:h-fit max-[600px]:w-[42%] max-[600px]:pt-[5vw]">
+                <h2 className="w-[65%] font-serif text-[3vw] font-light leading-[0.95] max-[600px]:w-full max-[600px]:text-[8.5vw]">{title}</h2>
               </div>
               <div className="flex h-full w-full gap-x-[15vw] max-[600px]:gap-x-[30vw]">
                 {top.map((item) => (

@@ -3,7 +3,7 @@ import type { ClientProject } from "@/content/client-work";
 import { apiVersion, dataset, projectId } from "@/sanity/env";
 
 const QUERY = `*[_type == "project" && defined(youtubeUrl)] | order(coalesce(order, 1e9) asc, _createdAt desc) {
-  _id, title, meta, youtubeUrl, "cover": cover.asset->url
+  _id, title, meta, description, youtubeUrl, "cover": cover.asset->url
 }`;
 
 async function query<T>(groq: string): Promise<T[] | null> {
@@ -58,12 +58,13 @@ export async function fetchCmsProjects(): Promise<Project[] | null> {
     const res = await fetch(url);
     if (!res.ok) return null;
     const { result } = (await res.json()) as {
-      result: { _id: string; title?: string; meta?: string; youtubeUrl: string; cover?: string }[];
+      result: { _id: string; title?: string; meta?: string; description?: string; youtubeUrl: string; cover?: string }[];
     };
     return result.map((d) => ({
       id: d._id,
       title: d.title ?? "",
       meta: d.meta,
+      description: d.description,
       youtubeUrl: d.youtubeUrl,
       cover: d.cover ? `${d.cover}?w=1280&auto=format` : undefined,
     }));

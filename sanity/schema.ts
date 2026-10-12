@@ -31,6 +31,13 @@ export const project = defineType({
       type: "string",
     }),
     defineField({
+      name: "description",
+      title: "Description",
+      description: "Optional. A couple of sentences shown under the card.",
+      type: "text",
+      rows: 3,
+    }),
+    defineField({
       name: "cover",
       title: "Cover still",
       description: "Optional. Shown before the video plays; without one, YouTube's thumbnail is used.",

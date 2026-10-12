@@ -18,12 +18,13 @@ interface WorkCardProps {
   id: string;
   title: string;
   meta?: string;
+  description?: string;
   youtubeUrl: string;
   cover?: string;
   className?: string;
 }
 
-export function WorkCard({ id, title, meta, youtubeUrl, cover, className }: WorkCardProps) {
+export function WorkCard({ id, title, meta, description, youtubeUrl, cover, className }: WorkCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -140,6 +141,9 @@ export function WorkCard({ id, title, meta, youtubeUrl, cover, className }: Work
           </motion.span>
         </button>
         {meta && <p className="font-sans text-xs font-light text-df-grey-light">{meta}</p>}
+        {description && (
+          <p className="max-w-[min(62vw,360px)] pb-1 font-sans text-xs font-light leading-relaxed text-white/60">{description}</p>
+        )}
         <motion.div
           className="h-px bg-gradient-to-r from-white/50 via-white/25 to-transparent"
           initial={{ scaleX: 0, originX: 0 }}

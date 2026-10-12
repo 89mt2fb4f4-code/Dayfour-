@@ -99,7 +99,9 @@ export default function Work() {
         id: p.id,
         title: p.title,
         content: p.meta ?? "",
-        media: <WorkCard id={p.id} title={p.title} meta={p.meta} youtubeUrl={p.youtubeUrl} cover={p.cover} />,
+        media: (
+          <WorkCard id={p.id} title={p.title} meta={p.meta} description={p.description} youtubeUrl={p.youtubeUrl} cover={p.cover} />
+        ),
       }))}
     />
   );
