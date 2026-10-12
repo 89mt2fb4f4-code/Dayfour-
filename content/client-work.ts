@@ -25,7 +25,7 @@ export const clientProjects: ClientProject[] = [
     subtitle: "Zack Leshauwn — Model",
     description:
       "A woman's hands emerge from Zack Leshauwn's own shadow, as if the darkness itself has claimed him. Conceived as the first chapter of his rebrand, Possession borrows the language of horror to look past the surface and show that modelling is not what defines him. The man, not the image.",
-    youtubeUrl: "https://youtu.be/TJSSIoVj0ko",
+    youtubeUrl: "https://youtu.be/BxitAGhxmTY",
     poster: "/assets/work/chapter-1-possession.jpg",
     instagram: "zack.leshauwn",
   },
