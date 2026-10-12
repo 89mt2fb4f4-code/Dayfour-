@@ -35,7 +35,7 @@ the expansion, then fades out. It starts on the visitor's first tap (browsers re
 Projects are added in the admin at **dayfour.studio/studio** (Sanity), under **Client work** or
 **DɅYFOVR Original**. Publishing there shows on
 the site within about a minute, with no rebuild. Setup: create a free project at sanity.io/manage,
-put its ID in `sanity/env.ts`, and add `https://dayfour.studio` (credentials allowed) under
+put its ID in `sanity/env.ts`, and add `https://www.dayfour.studio` and `https://dayfour.studio` (credentials allowed) under
 API → CORS origins.
 
 Projects can also live in code in `content/work.ts`; they show after the admin's.
