@@ -2,7 +2,9 @@
 
 /*
  * 21st.dev "Liquid Glass Carousel". Changes for DAYFOUR:
- *  - Black background, white type; the lens ring is silver instead of blue.
+ *  - Plain black: the lens keeps its liquid refraction at the edges but has no glow,
+ *    ring or rim line, so the background stays black. White type.
+ *  - Panels are sized to fit the screen's width too, so landscape (16:9) posters work on phones.
  *  - Vertical swipes and vertical wheel scroll pass through to the page (the canvas
  *    only takes horizontal drags), so the carousel never traps the scroll on a phone.
  *  - `controlRef` exposes the handle, so the client-work detail view can close focus.
@@ -74,9 +76,9 @@ const LENS = {
   dispersion: 11,
   blur: 0,
   glow: 4.2,
-  whiteGlow: 0.24,
+  whiteGlow: 0,
   novaSize: 12,
-  blueRing: 6,
+  blueRing: 0,
   ringRadius: 0.49,
   ringWidth: 0.014,
   shimmer: true,
@@ -89,7 +91,7 @@ const LENS = {
   rimFreq1: 2,
   rimFreq2: 1,
   blueColor: "#c9d2dc",
-  rimLine: 1.4,
+  rimLine: 0,
   rimLinePos: 0.488,
   rimLineWidth: 0.003,
   vignette: 0,
@@ -381,8 +383,10 @@ function createCarousel(
 
   let W = Math.max(1, mount.clientWidth);
   let H = Math.max(1, mount.clientHeight);
+  // Fit the height, and the width too: the widest panel never takes more than 80% of it.
+  const widest = Math.max(...items.map((i) => i.aspect || PORTRAIT_ASPECT));
   const panelHFor = () =>
-    Math.max(120, Math.min(options.panelHeight, Math.round(H * 0.52)));
+    Math.max(120, Math.min(options.panelHeight, Math.round(H * 0.52), Math.round((W * 0.8) / widest)));
   let PANEL_H = panelHFor();
   const GAP = options.gap;
   const EASE = reduced ? 0.28 : 0.09;

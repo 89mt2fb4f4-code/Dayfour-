@@ -49,17 +49,16 @@ export default function ClientWork() {
   const [detail, setDetail] = useState<number | null>(null);
   useScrollLock(detail !== null);
 
-  // The WebGL carousel starts only when the section comes into view, so its rise-in
-  // plays where it can be seen and nothing renders off screen.
+  // The WebGL carousel starts only when the section comes near, so nothing renders off screen.
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
-    const io = new IntersectionObserver(([e]) => e.isIntersecting && setNear(true), { threshold: 0.25 });
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && setNear(true), { rootMargin: "50% 0px" });
     io.observe(el);
     return () => io.disconnect();
   }, []);
 
-  const items = useMemo(() => projects?.map((p) => ({ src: p.poster, title: p.title, aspect: 3 / 4 })) ?? [], [projects]);
+  const items = useMemo(() => projects?.map((p) => ({ src: p.poster, title: p.title, aspect: 16 / 9 })) ?? [], [projects]);
 
   const openTimer = useRef(0);
   const onFocusChange = useCallback((focused: boolean) => {
@@ -77,18 +76,17 @@ export default function ClientWork() {
   return (
     <section ref={sectionRef} id="client-work" aria-label="Client work" className="relative bg-black">
       <h2 className="px-6 font-serif text-[2rem] font-light leading-none text-white">Client work</h2>
-      <div className="relative mt-2 h-[80svh] min-h-[460px] w-full">
+      <div className="relative mt-2 h-[44svh] min-h-[340px] w-full md:h-[80svh]">
         {near && items.length > 0 && (
           <LiquidGlassCarousel
             items={items}
+            entry={false}
+            className="min-h-[340px]"
             controlRef={controlRef}
             onActiveChange={(i) => (activeRef.current = i)}
             onFocusChange={onFocusChange}
           />
         )}
-        {/* The lens glow runs past the canvas; fade its top and bottom into the page. */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-20 bg-gradient-to-b from-black to-transparent" />
-        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-20 bg-gradient-to-t from-black to-transparent" />
       </div>
 
       {detail !== null &&

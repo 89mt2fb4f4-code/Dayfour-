@@ -1,5 +1,5 @@
 /* Elegant Carousel (client-work detail view). Black and white, phone first:
-   poster on top, text under it; side by side from 900px. */
+   16:9 poster on top, text under it; side by side from 900px. */
 
 .carousel-wrapper {
   position: relative;
@@ -139,25 +139,16 @@
 
 .carousel-image-frame {
   position: relative;
-  aspect-ratio: 3 / 4;
-  height: min(48svh, 520px);
+  aspect-ratio: 16 / 9;
+  width: 100%;
   overflow: hidden;
   background: #0d0d0d;
   transition:
     opacity 0.4s ease,
-    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-    aspect-ratio 0.5s ease,
-    height 0.5s ease,
-    width 0.5s ease;
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .carousel-image-frame.transitioning {
   transform: scale(0.96);
-}
-/* Playing: the frame opens up to the video's shape. */
-.carousel-image-frame.playing {
-  aspect-ratio: 16 / 9;
-  height: auto;
-  width: 100%;
 }
 
 .carousel-poster {
@@ -254,11 +245,11 @@
   .carousel-image-container {
     flex: 1;
   }
-  .carousel-image-frame {
-    height: min(64svh, 640px);
+  .carousel-content {
+    flex: 0.8;
   }
-  .carousel-image-frame.playing {
-    height: auto;
+  .carousel-image-container {
+    flex: 1.2;
   }
   .carousel-description {
     font-size: 16px;

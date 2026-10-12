@@ -22,7 +22,7 @@ const CLIENT_QUERY = `*[_type == "clientProject" && defined(youtubeUrl) && defin
   _id, title, subtitle, description, youtubeUrl, "poster": poster.asset->url, "hotspot": poster.hotspot
 }`;
 
-/** Client work from the admin; posters cropped to 3:4 around the chosen hotspot. */
+/** Client work from the admin; posters cropped to 16:9 around the chosen hotspot. */
 export async function fetchClientProjects(): Promise<ClientProject[] | null> {
   const rows = await query<{
     _id: string;
@@ -42,7 +42,7 @@ export async function fetchClientProjects(): Promise<ClientProject[] | null> {
         subtitle: d.subtitle,
         description: d.description,
         youtubeUrl: d.youtubeUrl,
-        poster: `${d.poster}?w=900&h=1200&fit=crop${focus}&auto=format`,
+        poster: `${d.poster}?w=1600&h=900&fit=crop${focus}&auto=format`,
       };
     }) ?? null
   );

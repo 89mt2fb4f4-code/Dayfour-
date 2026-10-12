@@ -66,7 +66,7 @@ export const clientProject = defineType({
     defineField({
       name: "poster",
       title: "Poster",
-      description: "An upright still. It is cropped to 3:4; drag the hotspot to choose the centre.",
+      description: "A landscape still from the video. It is cropped to 16:9; drag the hotspot to choose the centre.",
       type: "image",
       options: { hotspot: true },
       validation: (r) => r.required(),

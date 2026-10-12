@@ -12,11 +12,11 @@ export type ClientProject = {
   subtitle?: string;
   description?: string;
   youtubeUrl: string;
-  /** Upright (3:4) still for the carousel and the detail view. */
+  /** Landscape (16:9) still for the carousel and the detail view. */
   poster: string;
 };
 
-const photo = (id: string) => `https://images.unsplash.com/photo-${id}?w=900&h=1200&q=85&auto=format&fit=crop`;
+const photo = (id: string) => `https://images.unsplash.com/photo-${id}?w=1600&h=900&q=80&auto=format&fit=crop`;
 const SAMPLE_NOTE = "Temporary sample so the layout can be seen. Add client work in the admin and these disappear.";
 
 export const sampleClientProjects: ClientProject[] = [

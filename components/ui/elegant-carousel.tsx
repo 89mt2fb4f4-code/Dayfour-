@@ -5,7 +5,7 @@
  * project tapped in the glass carousel and shows its number, title, client line and
  * description beside the poster, with arrows and labelled tabs for the others.
  * Changes for DAYFOUR:
- *  - Slides come in as props (client projects); the poster plays the project's
+ *  - Slides come in as props (client projects); the 16:9 poster plays the project's
  *    YouTube video in place when tapped.
  *  - No auto-advance: the visitor opened this project to read about it.
  *  - Black and white; the colour accents and decorative frame corners are left out.
@@ -132,7 +132,7 @@ export default function ElegantCarousel({
         </div>
 
         <div className="carousel-image-container">
-          <div className={`carousel-image-frame ${state} ${playing ? "playing" : ""}`}>
+          <div className={`carousel-image-frame ${state}`}>
             {playing && videoId ? (
               <iframe
                 src={youtubeEmbed(videoId)}
