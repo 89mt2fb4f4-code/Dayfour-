@@ -113,6 +113,16 @@ export default function ElegantCarousel({
             <h2 className={`carousel-title ${state}`}>{slide.title}</h2>
             {slide.subtitle && <p className={`carousel-subtitle ${state}`}>{slide.subtitle}</p>}
             {slide.description && <p className={`carousel-description ${state}`}>{slide.description}</p>}
+            {slide.instagram && (
+              <a
+                href={`https://www.instagram.com/${slide.instagram}/`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`carousel-credit ${state}`}
+              >
+                @{slide.instagram}
+              </a>
+            )}
 
             {slides.length > 1 && (
               <div className="carousel-nav-arrows">

@@ -19,7 +19,7 @@ async function query<T>(groq: string): Promise<T[] | null> {
 }
 
 const CLIENT_QUERY = `*[_type == "clientProject" && defined(youtubeUrl) && defined(poster.asset)] | order(coalesce(order, 1e9) asc, _createdAt desc) {
-  _id, title, subtitle, description, youtubeUrl, "poster": poster.asset->url, "hotspot": poster.hotspot
+  _id, title, subtitle, description, instagram, youtubeUrl, "poster": poster.asset->url, "hotspot": poster.hotspot
 }`;
 
 /** Client work from the admin; posters cropped to 16:9 around the chosen hotspot. */
@@ -29,6 +29,7 @@ export async function fetchClientProjects(): Promise<ClientProject[] | null> {
     title?: string;
     subtitle?: string;
     description?: string;
+    instagram?: string;
     youtubeUrl: string;
     poster: string;
     hotspot?: { x: number; y: number };
@@ -41,6 +42,7 @@ export async function fetchClientProjects(): Promise<ClientProject[] | null> {
         title: d.title ?? "",
         subtitle: d.subtitle,
         description: d.description,
+        instagram: d.instagram?.replace(/^@/, "").trim() || undefined,
         youtubeUrl: d.youtubeUrl,
         poster: `${d.poster}?w=1600&h=900&fit=crop${focus}&auto=format`,
       };

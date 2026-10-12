@@ -3,14 +3,15 @@
 /*
  * Client work: the liquid glass carousel of client projects. Tapping the centred one
  * focuses it, then the detail view (Elegant Carousel) opens over the page with that
- * project's information and video. Projects come from the admin; until there are any,
- * temporary samples show (content/client-work.ts).
+ * project's information and video. Projects come from the admin and content/client-work.ts;
+ * until there are any, temporary samples show.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { LiquidGlassCarousel, type LiquidGlassCarouselHandle } from "@/components/ui/liquid-glass-carousel";
 import ElegantCarousel from "@/components/ui/elegant-carousel";
-import { sampleClientProjects, type ClientProject } from "@/content/client-work";
+import { clientProjects, sampleClientProjects, type ClientProject } from "@/content/client-work";
+import { youtubeId } from "@/lib/youtube";
 import { fetchClientProjects } from "@/lib/cms";
 
 function useClientProjects() {
@@ -18,7 +19,11 @@ function useClientProjects() {
   useEffect(() => {
     let live = true;
     fetchClientProjects().then((cms) => {
-      if (live) setProjects(cms?.length ? cms : sampleClientProjects);
+      if (!live) return;
+      // Admin projects first, then the ones in code that aren't already in the admin.
+      const seen = new Set((cms ?? []).map((p) => youtubeId(p.youtubeUrl)));
+      const all = [...(cms ?? []), ...clientProjects.filter((p) => !seen.has(youtubeId(p.youtubeUrl)))];
+      setProjects(all.length ? all : sampleClientProjects);
     });
     return () => {
       live = false;

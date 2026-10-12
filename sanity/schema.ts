@@ -62,6 +62,12 @@ export const clientProject = defineType({
       type: "text",
       rows: 4,
     }),
+    defineField({
+      name: "instagram",
+      title: "Instagram to credit",
+      description: "Optional. The handle without the @, e.g. “zack.lashawn”. Shown as a link.",
+      type: "string",
+    }),
     youtubeField,
     defineField({
       name: "poster",

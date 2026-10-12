@@ -1,9 +1,9 @@
 /*
- * Client work: added in the admin (dayfour.studio/studio → Client work).
+ * Client work: added in the admin (dayfour.studio/studio → Client work) or listed in
+ * `clientProjects` below. Admin projects show first, then these.
  *
- * While the admin has no client projects yet, the section shows the TEMPORARY SAMPLES
- * below so the layout can be seen. They disappear on their own as soon as the first
- * client project is published. Stock photos and Blender open films, not DAYFOUR work.
+ * Only when both are empty does the section show the TEMPORARY SAMPLES, so the layout
+ * can be seen. Stock photos and Blender open films, not DAYFOUR work.
  */
 export type ClientProject = {
   id: string;
@@ -14,7 +14,22 @@ export type ClientProject = {
   youtubeUrl: string;
   /** Landscape (16:9) still for the carousel and the detail view. */
   poster: string;
+  /** Instagram handle to credit, without the @, e.g. "zack.lashawn". */
+  instagram?: string;
 };
+
+export const clientProjects: ClientProject[] = [
+  {
+    id: "chapter-1-possession",
+    title: "Chapter 1 — Possession",
+    subtitle: "Zack Lashawn — Model",
+    description:
+      "A woman's hands emerge from Zack Lashawn's own shadow, as if the darkness itself has claimed him. Conceived as the first chapter of his rebrand, Possession borrows the language of horror to look past the surface and show that modelling is not what defines him. The man, not the image.",
+    youtubeUrl: "https://youtu.be/TJSSIoVj0ko",
+    poster: "/assets/work/chapter-1-possession.jpg",
+    instagram: "zack.lashawn",
+  },
+];
 
 const photo = (id: string) => `https://images.unsplash.com/photo-${id}?w=1600&h=900&q=80&auto=format&fit=crop`;
 const SAMPLE_NOTE = "Temporary sample so the layout can be seen. Add client work in the admin and these disappear.";
