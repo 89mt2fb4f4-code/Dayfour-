@@ -17,7 +17,7 @@ export default function Disciplines() {
     <section
       id="what-we-make"
       aria-label="What we make"
-      className="relative -mt-[30svh] flex h-[78svh] items-end justify-center overflow-hidden bg-black px-6 pb-6"
+      className="relative -mt-[30svh] flex h-[78svh] items-end justify-center overflow-hidden bg-black px-6 pb-6 md:h-[90svh] md:pb-12"
       style={{ maskImage: FEATHER, WebkitMaskImage: FEATHER }}
     >
       <motion.div
@@ -31,7 +31,7 @@ export default function Disciplines() {
           <div key={text} className="overflow-hidden">
             <motion.p
               variants={{ hidden: { transform: "translateY(100%)", opacity: 0 }, visible: { transform: "translateY(0%)", opacity: 1, transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] } } }}
-              className={`font-sans text-[2.6rem] uppercase leading-[1.02] tracking-[-0.01em] text-white ${bold ? "text-right font-medium" : "font-light"}`}
+              className={`font-sans text-[2.6rem] uppercase leading-[1.02] tracking-[-0.01em] text-white md:text-[4.75rem] lg:text-[6rem] ${bold ? "text-right font-medium" : "font-light"}`}
             >
               {text}
             </motion.p>

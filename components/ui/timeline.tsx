@@ -232,7 +232,7 @@ export default function Timeline({
       className="relative w-full"
       style={{ color: textColor, backgroundColor, height: `max(200vw, ${Math.max(230, 150 + count * 70)}vh)` }}
     >
-      <div className="sticky top-0 h-[100svh] w-screen overflow-hidden pt-[10%] max-[600px]:pt-[12svh]">
+      <div className="sticky top-0 h-[100svh] w-screen overflow-hidden pt-[10%] max-[600px]:pt-[12svh] min-[601px]:flex min-[601px]:items-center min-[601px]:pt-0">
         <div
           ref={wholeSliderRef}
           className="flex h-[30vw] items-center gap-[5vw] px-[5vw] max-[600px]:h-[76svh] max-[600px]:px-[7vw]"

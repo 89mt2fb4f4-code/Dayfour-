@@ -27,6 +27,26 @@ export default function Opening() {
     return () => clearTimeout(t);
   }, []);
 
+  // Hand-off to the footage window: hide the pinned scene once it is full-bleed, and in any
+  // case once the expansion has been scrolled past (a quick scroll can leave its eased
+  // progress just short of the end, which would show the scene's edge over the next section).
+  const sceneDone = useRef(false);
+  const syncHandOff = useCallback(() => {
+    const wrap = wrapRef.current;
+    const track = trackRef.current;
+    if (!wrap) return;
+    const past = !!track && track.getBoundingClientRect().bottom <= window.innerHeight + 1;
+    wrap.style.visibility = sceneDone.current || past ? "hidden" : "";
+  }, []);
+  useEffect(() => {
+    addEventListener("scroll", syncHandOff, { passive: true });
+    addEventListener("resize", syncHandOff);
+    return () => {
+      removeEventListener("scroll", syncHandOff);
+      removeEventListener("resize", syncHandOff);
+    };
+  }, [syncHandOff]);
+
   // The word is solid white, and turns into the scene as the camera goes through the D.
   const onPortal = useCallback((p: number) => {
     wrapRef.current?.style.setProperty("--word-white", String(1 - smooth(0.06, 0.6, p)));
@@ -68,7 +88,8 @@ export default function Opening() {
                   getSound().rise(p);
                   // Full-bleed: hand over to the identical footage window underneath, so the
                   // footage never slides when the pinned scene lets go.
-                  if (wrapRef.current) wrapRef.current.style.visibility = p >= 0.999 && target >= 0.999 ? "hidden" : "";
+                  sceneDone.current = p >= 0.999 && target >= 0.999;
+                  syncHandOff();
                 }}
               />
             }
