@@ -2,31 +2,28 @@
 
 /*
  * Adapted from 21st.dev "Expand Map" (LocationMap).
- * Kept: the 3D tilt that follows the pointer, the spring expand on tap, the
- * underline that grows on hover. Replaced: the map drawing, pin and "Live" badge
- * with a video still that becomes a playing YouTube video when opened.
- * Square corners, black and white. Only one card plays at a time.
+ * Kept: the 3D tilt that follows the pointer and the underline that grows on hover.
+ * Replaced: the map drawing, pin and "Live" badge with the project's still. Tapping the
+ * card opens the full detail view (description and video), the same one Client work uses.
+ * Square corners, black and white.
  */
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from "motion/react";
-import { youtubeEmbed, youtubeId, youtubeThumb } from "@/lib/youtube";
-
-const OPEN_EVENT = "dayfour:work-open";
+import { useRef, useState } from "react";
+import { motion, useMotionValue, useTransform, useSpring } from "motion/react";
+import { Play } from "lucide-react";
+import { youtubeId, youtubeThumb } from "@/lib/youtube";
 
 interface WorkCardProps {
-  id: string;
   title: string;
   meta?: string;
-  description?: string;
   youtubeUrl: string;
   cover?: string;
+  onOpen: () => void;
   className?: string;
 }
 
-export function WorkCard({ id, title, meta, description, youtubeUrl, cover, className }: WorkCardProps) {
+export function WorkCard({ title, meta, youtubeUrl, cover, onOpen, className }: WorkCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoId = youtubeId(youtubeUrl);
   const still = cover ?? (videoId ? youtubeThumb(videoId) : undefined);
@@ -37,15 +34,6 @@ export function WorkCard({ id, title, meta, description, youtubeUrl, cover, clas
   const rotateY = useTransform(mouseX, [-50, 50], [-8, 8]);
   const springRotateX = useSpring(rotateX, { stiffness: 300, damping: 30 });
   const springRotateY = useSpring(rotateY, { stiffness: 300, damping: 30 });
-
-  // Opening one card closes the others.
-  useEffect(() => {
-    const onOpen = (e: Event) => {
-      if ((e as CustomEvent<string>).detail !== id) setIsExpanded(false);
-    };
-    addEventListener(OPEN_EVENT, onOpen);
-    return () => removeEventListener(OPEN_EVENT, onOpen);
-  }, [id]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
@@ -60,33 +48,25 @@ export function WorkCard({ id, title, meta, description, youtubeUrl, cover, clas
     setIsHovered(false);
   };
 
-  const toggle = () => {
-    const next = !isExpanded;
-    setIsExpanded(next);
-    if (next) dispatchEvent(new CustomEvent(OPEN_EVENT, { detail: id }));
-  };
-
   return (
     <motion.div
       ref={containerRef}
-      className={`relative select-none ${className ?? ""}`}
+      className={`relative w-[min(62vw,360px)] select-none ${className ?? ""}`}
       style={{ perspective: 1000 }}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Width animates only for the moment of a tap. (A layout/FLIP animation fights the
-          timeline's sideways transform, so plain width is the right tool here.) */}
-      <motion.div
-        initial={false}
-        animate={{ width: isExpanded ? "min(86vw, 640px)" : "min(62vw, 360px)" }}
-        transition={{ type: "spring", stiffness: 400, damping: 35 }}
-      >
       <motion.div
         className="relative overflow-hidden border border-white/15 bg-black"
         style={{ rotateX: springRotateX, rotateY: springRotateY, transformStyle: "preserve-3d" }}
       >
-        <div className="relative aspect-video w-full">
+        <button
+          type="button"
+          onClick={onOpen}
+          aria-label={`Open ${title}`}
+          className="group relative block aspect-video w-full cursor-pointer focus-visible:outline focus-visible:outline-1 focus-visible:-outline-offset-4 focus-visible:outline-white"
+        >
           {still && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -102,36 +82,15 @@ export function WorkCard({ id, title, meta, description, youtubeUrl, cover, clas
               }}
             />
           )}
-          <AnimatePresence>
-            {isExpanded && videoId && (
-              <motion.iframe
-                key="player"
-                src={youtubeEmbed(videoId)}
-                title={title}
-                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-                allowFullScreen
-                className="absolute inset-0 h-full w-full"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4, delay: 0.1 }}
-              />
-            )}
-          </AnimatePresence>
-          {!isExpanded && (
-            <button
-              type="button"
-              onClick={toggle}
-              aria-label={`Play ${title}`}
-              className="absolute inset-0 cursor-pointer bg-black/25 transition-colors hover:bg-black/10 focus-visible:outline focus-visible:outline-1 focus-visible:-outline-offset-4 focus-visible:outline-white"
-            />
-          )}
-        </div>
-      </motion.div>
+          <span className="absolute inset-0 bg-black/25 transition-colors group-hover:bg-black/10" />
+          <span className="absolute left-1/2 top-1/2 flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/35 bg-black/30 text-white backdrop-blur-sm">
+            <Play className="size-4 translate-x-px" strokeWidth={1.5} fill="currentColor" />
+          </span>
+        </button>
       </motion.div>
 
       <div className="mt-3 space-y-1">
-        <button type="button" onClick={toggle} className="block text-left">
+        <button type="button" onClick={onOpen} className="block text-left">
           <motion.span
             className="block font-serif text-2xl font-light text-white"
             animate={{ x: isHovered ? 4 : 0 }}
@@ -141,13 +100,10 @@ export function WorkCard({ id, title, meta, description, youtubeUrl, cover, clas
           </motion.span>
         </button>
         {meta && <p className="font-sans text-xs font-light text-df-grey-light">{meta}</p>}
-        {description && (
-          <p className="max-w-[min(62vw,360px)] pb-1 font-sans text-xs font-light leading-relaxed text-white/60">{description}</p>
-        )}
         <motion.div
           className="h-px bg-gradient-to-r from-white/50 via-white/25 to-transparent"
           initial={{ scaleX: 0, originX: 0 }}
-          animate={{ scaleX: isHovered || isExpanded ? 1 : 0.3 }}
+          animate={{ scaleX: isHovered ? 1 : 0.3 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
         />
       </div>

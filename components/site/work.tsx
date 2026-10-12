@@ -2,10 +2,12 @@
 
 import Timeline from "@/components/ui/timeline";
 import { WorkCard } from "@/components/ui/expand-map";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import ProjectDetail from "@/components/site/project-detail";
+import type { ClientProject } from "@/content/client-work";
 import { projects as localProjects, type Project } from "@/content/work";
 import { fetchCmsProjects } from "@/lib/cms";
-import { youtubeId } from "@/lib/youtube";
+import { youtubeId, youtubeThumb } from "@/lib/youtube";
 
 /** Shown while there is no work to list. Type after the angled "Coming soon" screen reference. */
 function ComingSoon() {
@@ -86,8 +88,26 @@ function useProjects() {
 
 export default function Work() {
   const projects = useProjects();
+  const [detail, setDetail] = useState<number | null>(null);
+  // The same detail view as Client work: tapping a card shows its description and video.
+  const slides = useMemo<ClientProject[]>(
+    () =>
+      projects.map((p) => {
+        const id = youtubeId(p.youtubeUrl);
+        return {
+          id: p.id,
+          title: p.title,
+          subtitle: p.meta,
+          description: p.description,
+          youtubeUrl: p.youtubeUrl,
+          poster: p.cover ?? (id ? youtubeThumb(id) : ""),
+        };
+      }),
+    [projects],
+  );
   if (!projects.length) return <ComingSoon />;
   return (
+    <>
     <Timeline
       title="DɅYFOVR Original"
       lead={
@@ -95,14 +115,14 @@ export default function Work() {
           <p className="font-serif text-2xl font-light italic text-white/80">The work is the argument.</p>
         </div>
       }
-      items={projects.map((p) => ({
+      items={projects.map((p, i) => ({
         id: p.id,
         title: p.title,
         content: p.meta ?? "",
-        media: (
-          <WorkCard id={p.id} title={p.title} meta={p.meta} description={p.description} youtubeUrl={p.youtubeUrl} cover={p.cover} />
-        ),
+        media: <WorkCard title={p.title} meta={p.meta} youtubeUrl={p.youtubeUrl} cover={p.cover} onOpen={() => setDetail(i)} />,
       }))}
     />
+    <ProjectDetail projects={slides} index={detail} onClose={() => setDetail(null)} />
+    </>
   );
 }

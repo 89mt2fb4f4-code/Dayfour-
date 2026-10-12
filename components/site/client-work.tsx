@@ -7,9 +7,8 @@
  * until there are any, temporary samples show.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { LiquidGlassCarousel, type LiquidGlassCarouselHandle } from "@/components/ui/liquid-glass-carousel";
-import ElegantCarousel from "@/components/ui/elegant-carousel";
+import ProjectDetail from "@/components/site/project-detail";
 import { clientProjects, sampleClientProjects, type ClientProject } from "@/content/client-work";
 import { youtubeId } from "@/lib/youtube";
 import { fetchClientProjects } from "@/lib/cms";
@@ -32,19 +31,6 @@ function useClientProjects() {
   return projects;
 }
 
-/** Stops the page behind the detail view from scrolling while it is open. */
-function useScrollLock(locked: boolean) {
-  useEffect(() => {
-    if (!locked) return;
-    const root = document.documentElement;
-    const prev = root.style.overflow;
-    root.style.overflow = "hidden";
-    return () => {
-      root.style.overflow = prev;
-    };
-  }, [locked]);
-}
-
 export default function ClientWork() {
   const projects = useClientProjects();
   const sectionRef = useRef<HTMLElement>(null);
@@ -52,7 +38,6 @@ export default function ClientWork() {
   const activeRef = useRef(0);
   const [near, setNear] = useState(false);
   const [detail, setDetail] = useState<number | null>(null);
-  useScrollLock(detail !== null);
 
   // The WebGL carousel starts only when the section comes near, so nothing renders off screen.
   useEffect(() => {
@@ -94,14 +79,7 @@ export default function ClientWork() {
         )}
       </div>
 
-      {detail !== null &&
-        projects &&
-        createPortal(
-          <div className="fixed inset-0 z-[90] overflow-y-auto overscroll-contain bg-black">
-            <ElegantCarousel slides={projects} startIndex={detail} onClose={close} />
-          </div>,
-          document.body,
-        )}
+      {projects && <ProjectDetail projects={projects} index={detail} onClose={close} />}
     </section>
   );
 }

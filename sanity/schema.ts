@@ -33,7 +33,7 @@ export const project = defineType({
     defineField({
       name: "description",
       title: "Description",
-      description: "Optional. A couple of sentences shown under the card.",
+      description: "Optional. A couple of sentences, shown when the project is opened.",
       type: "text",
       rows: 3,
     }),

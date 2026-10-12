@@ -8,7 +8,7 @@ export type Project = {
   title: string;
   /** One line under the title, e.g. "Fashion. New York. 2026." */
   meta?: string;
-  /** A couple of sentences under the card. */
+  /** A couple of sentences, shown when the card is opened. */
   description?: string;
   youtubeUrl: string;
   /** Still shown before the video plays. Defaults to YouTube's thumbnail. */

@@ -154,7 +154,13 @@ export default function ElegantCarousel({
             ) : (
               <button type="button" className="carousel-poster" onClick={() => setPlaying(true)} aria-label={`Play ${slide.title}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={slide.poster} alt="" className="carousel-image" crossOrigin="anonymous" />
+                <img
+                  src={slide.poster}
+                  alt=""
+                  className="carousel-image"
+                  // Reuses the carousel's (CORS) copy of the poster; YouTube stills load plainly.
+                  crossOrigin={slide.poster.includes("ytimg.com") ? undefined : "anonymous"}
+                />
                 <span className="carousel-play">
                   <Play className="size-5 translate-x-px" strokeWidth={1.5} fill="currentColor" />
                 </span>
