@@ -10,16 +10,17 @@ import { INSTAGRAM_DM } from "@/lib/links";
 
 const navigationData: NavigationSection[] = [
   { title: "Home", href: "top", isActive: true },
-  { title: "About", href: "about", offset: 0.3 },
-  { title: "What we make", href: "what-we-make" },
+  { title: "About", href: "/about" },
+  { title: "What we make", href: "what-we-make", offset: 0.3 },
   { title: "Our work", href: "work" },
   { title: "Let's work", href: "contact" },
 ];
 
-export default function AgencyHeroSection() {
+export default function AgencyHeroSection({ currentPage }: { currentPage?: string }) {
   return (
     <Header
       navigationData={navigationData}
+      currentPage={currentPage}
       collaborateHref={INSTAGRAM_DM}
       instagramHref="https://www.instagram.com/dayfour.studio/"
     />

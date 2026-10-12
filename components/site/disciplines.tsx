@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from "motion/react";
-import Crosshairs from "@/components/ui/crosshairs";
 
-/** "Short Film. Commercial. Documentary." set in a thin frame with corner dots. */
+const FEATHER = "linear-gradient(to bottom, transparent 0, #000 30svh)";
+
+/** "Short Film. Commercial. Documentary." */
 export default function Disciplines() {
   const lines = [
     { text: "Short Film.", bold: false },
@@ -11,8 +12,14 @@ export default function Disciplines() {
     { text: "Documentary", bold: true },
   ];
   return (
-    <section id="what-we-make" aria-label="What we make" className="relative flex h-[72svh] items-center justify-center overflow-hidden bg-black px-6">
-      <Crosshairs seed={23} count={6} />
+    // Follows the expanded timeline directly: it overlaps the moving footage and fades in
+    // over it, so there is no edge between them.
+    <section
+      id="what-we-make"
+      aria-label="What we make"
+      className="relative -mt-[30svh] flex h-[100svh] items-center justify-center overflow-hidden bg-black px-6"
+      style={{ maskImage: FEATHER, WebkitMaskImage: FEATHER }}
+    >
       <motion.div
         initial="hidden"
         whileInView="visible"
@@ -20,24 +27,6 @@ export default function Disciplines() {
         transition={{ staggerChildren: 0.12 }}
         className="relative px-5 py-4"
       >
-        {/* Frame: lines run past the corners, a second rail sits just under the bottom edge,
-            and a dot marks each crossing (after the "Give yourself permission" reference). */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <span className="absolute -left-[100vw] -right-[100vw] top-0 h-px bg-white/25" />
-          <span className="absolute -left-[100vw] -right-[100vw] bottom-0 h-px bg-white/25" />
-          <span className="absolute -left-[100vw] -right-[100vw] h-px bg-white/25" style={{ top: "calc(100% + 18px)" }} />
-          <span className="absolute -bottom-[40svh] -top-[40svh] left-0 w-px bg-white/25" />
-          <span className="absolute -bottom-[40svh] -top-[40svh] right-0 w-px bg-white/25" />
-          {["0%", "100%", "calc(100% + 18px)"].flatMap((y) =>
-            ["0%", "100%"].map((x) => (
-              <span
-                key={y + x}
-                className="absolute size-[6px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
-                style={{ left: x, top: y }}
-              />
-            )),
-          )}
-        </div>
         {lines.map(({ text, bold }) => (
           <div key={text} className="overflow-hidden">
             <motion.p

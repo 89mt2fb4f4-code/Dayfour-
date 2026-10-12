@@ -4,7 +4,7 @@
  * Adapted from 21st.dev "Scroll-Triggered Video Hero" (daiwiikharihar).
  * Changes for DAYFOUR:
  *  - Chapters come in as props. Each can have a video or a CSS background
- *    (the about section uses grey, grainy gradients after the EVOLVE poster).
+ *    (the about page uses plain black).
  *  - Kept: header line, masked title reveal, the frosted glass text box.
  *  - Removed: chapter numbers, the indigo accents, the button and the floating
  *    progress pill. Type is white; titles use the condensed poster face.
@@ -12,7 +12,6 @@
  */
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { motion, useScroll, type Variants } from "motion/react";
-import Crosshairs from "@/components/ui/crosshairs";
 
 export interface Chapter {
   id: string;
@@ -72,8 +71,7 @@ const ChapterBackgrounds = ({ chapters, current }: { chapters: Chapter[]; curren
         )}
       </motion.div>
     ))}
-    <FilmGrain />
-    <Crosshairs seed={37} count={9} className="z-20" />
+    {chapters.some((c) => c.videoUrl) && <FilmGrain />}
   </div>
 );
 

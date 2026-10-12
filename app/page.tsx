@@ -1,5 +1,4 @@
 import Opening from "@/components/site/opening";
-import About from "@/components/site/about";
 import Work from "@/components/site/work";
 import Disciplines from "@/components/site/disciplines";
 import SoundToggle from "@/components/site/sound-toggle";
@@ -12,7 +11,6 @@ export default function Home() {
     <main className="w-full bg-black">
       <h1 className="sr-only">DAYFOUR. Film. Commercial. Documentary.</h1>
       <Opening />
-      <About />
       <Disciplines />
       <Work />
       <LetsWorkTogether contactHref={INSTAGRAM_DM} />

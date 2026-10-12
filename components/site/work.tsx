@@ -6,14 +6,12 @@ import { useEffect, useState } from "react";
 import { projects as localProjects, type Project } from "@/content/work";
 import { fetchCmsProjects } from "@/lib/cms";
 import { youtubeId } from "@/lib/youtube";
-import Crosshairs from "@/components/ui/crosshairs";
 
 /** Shown while there is no work to list. Type after the angled "Coming soon" screen reference. */
 function ComingSoon() {
   const hud = "font-hud text-[9px] font-medium uppercase leading-[1.35] tracking-[0.08em] text-white/55";
   return (
     <section id="work" aria-label="Our work, coming soon" className="relative flex h-[100svh] items-center justify-center overflow-hidden bg-black">
-      <Crosshairs seed={51} count={7} />
       <p className="absolute left-6 top-[calc(24px+env(safe-area-inset-top,0px))] font-serif text-xl font-light tracking-[0.08em] text-white/80">
         Our work
       </p>

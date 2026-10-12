@@ -12,15 +12,19 @@ npm run build    # static site in out/
 
 ## Page order
 
-1. **Opening** (`components/site/opening.tsx`): logo render, then DɅYFOVR as a Glyph Portal into the
-   slow timeline, then the scroll expansion ("We don't / do normal") that scrubs the fast timeline.
-2. **About** (`components/site/about.tsx`): four chapters in the EVOLVE poster style.
-3. **Work** (`components/site/work.tsx`): "Coming soon" until projects exist, then the horizontal
-   timeline with tap-to-play YouTube cards.
-4. **Let's work** and the **footer** with the metallic button. Both open the studio's Instagram DM
-   (`lib/links.ts`).
+Home (`app/page.tsx`):
 
-Sound is synthesized in `lib/sound.ts` and starts on the visitor's first tap (browsers require one).
+1. **Opening** (`components/site/opening.tsx`): DɅYFOVR as a Glyph Portal into the slow timeline,
+   then the scroll expansion ("We don't / do normal") that scrubs the fast timeline.
+2. **What we make** (`components/site/disciplines.tsx`): fades in over the running footage.
+3. **Work** (`components/site/work.tsx`): the horizontal timeline with tap-to-play YouTube cards
+   ("Coming soon" while there are no projects).
+4. **Let's work**: the metallic button opens the studio's Instagram DM (`lib/links.ts`).
+
+**About** is its own page (`app/about/page.tsx`): four chapters on black, reached from the menu.
+
+Sound (`lib/sound.ts`) is only the timeline's own audio: it loops from the opening, quickens with
+the expansion, then fades out. It starts on the visitor's first tap (browsers require one).
 
 ## Adding work
 

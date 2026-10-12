@@ -13,7 +13,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { drawFrame, frameAt, loadFastFrames, loopIndex, scrubIndex, setLooping } from "@/lib/fast-frames";
 import { getSound } from "@/lib/sound";
-import Crosshairs from "@/components/ui/crosshairs";
 
 interface ExpandSceneProps {
   trackRef: RefObject<HTMLElement | null>;
@@ -47,8 +46,6 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
   const videoRef = useRef<HTMLVideoElement>(null);
   const leftRef = useRef<HTMLHeadingElement>(null);
   const rightRef = useRef<HTMLHeadingElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLDivElement>(null);
   const captionRef = useRef<HTMLParagraphElement>(null);
   const progressRef = useRef(onProgress);
   progressRef.current = onProgress;
@@ -81,7 +78,6 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
 
       const startW = Math.min(300, vw * 0.78);
       const startH = Math.min(400, vh * 0.52);
-      rootRef.current!.style.setProperty("--bx", `${startW / 2}px`);
       const e = p < 0.5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2;
       boxRef.current!.style.width = `${startW + (vw - startW) * e}px`;
       boxRef.current!.style.height = `${startH + (vh - startH) * e}px`;
@@ -98,9 +94,7 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
         rightRef.current.style.transform = `translate3d(${shift}vw, 0, 0)`;
         leftRef.current.style.opacity = fade;
         rightRef.current.style.opacity = fade;
-        const gridFade = String(1 - smooth(0.05, 0.35, p));
-        if (gridRef.current) gridRef.current.style.opacity = gridFade;
-        if (captionRef.current) captionRef.current.style.opacity = gridFade;
+        if (captionRef.current) captionRef.current.style.opacity = String(1 - smooth(0.05, 0.35, p));
       }
 
       // Slow video while still; the fast frames take over with the first stretch of scroll.
@@ -128,14 +122,6 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
       if (!raf) raf = requestAnimationFrame(paint);
     };
 
-    const measure = new ResizeObserver(() => {
-      const t = titleRef.current;
-      if (!t) return;
-      rootRef.current!.style.setProperty("--gx", `${t.offsetWidth / 2}px`);
-      rootRef.current!.style.setProperty("--gy", `${t.offsetHeight / 2}px`);
-    });
-    if (titleRef.current) measure.observe(titleRef.current);
-
     const seen = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
       if (!visible) getSound().scene(false);
@@ -153,7 +139,6 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
     return () => {
       cancelAnimationFrame(raf);
       seen.disconnect();
-      measure.disconnect();
       removeEventListener("scroll", schedule);
       removeEventListener("resize", schedule);
     };
@@ -166,33 +151,6 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
         <img src={bgImageSrc} alt="" className="h-full w-full object-cover object-center" />
       </div>
 
-      {/* Grid lines around the title, behind the video box, with dots where they cross.
-          --gy is half the title block's height (measured below); --bx is half the box's
-          starting width, so the vertical rails and their dots sit just outside the box. */}
-      {titleLines && (
-        <div ref={gridRef} aria-hidden="true" className="pointer-events-none absolute inset-0">
-          {["calc(50% - var(--gy, 48px))", "calc(50% + var(--gy, 48px))"].map((top) => (
-            <span key={top} className="absolute inset-x-0 h-px bg-white/25" style={{ top }} />
-          ))}
-          {["calc(50% - var(--bx, 150px) - 34px)", "calc(50% - var(--bx, 150px) - 14px)", "calc(50% + var(--bx, 150px) + 14px)"].map(
-            (left) => (
-              <span key={left} className="absolute inset-y-0 w-px bg-white/25" style={{ left }} />
-            ),
-          )}
-          {["calc(50% - var(--gy, 48px))", "calc(50% + var(--gy, 48px))"].flatMap((top) =>
-            ["calc(50% - var(--bx, 150px) - 34px)", "calc(50% - var(--bx, 150px) - 14px)", "calc(50% + var(--bx, 150px) + 14px)"].map(
-              (left) => (
-                <span
-                  key={top + left}
-                  className="absolute size-[5px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
-                  style={{ top, left }}
-                />
-              ),
-            ),
-          )}
-        </div>
-      )}
-      <Crosshairs seed={11} count={8} />
 
       <div
         ref={boxRef}
@@ -224,9 +182,9 @@ export default function ExpandScene({ trackRef, mediaSrc, mediaSrcAlt, posterSrc
 
       {titleLines && (
         <div className="absolute inset-0 flex items-center justify-center text-center">
-          {/* Poster-style title: tight grotesk, registered mark, thin grid lines (after the
-              Nocturna reference), with a small red caption (after the Murakami reference). */}
-          <div ref={titleRef} className="relative px-3 py-2">
+          {/* Poster-style title: tight grotesk and a registered mark (after the Nocturna
+              reference), with a small red caption (after the Murakami reference). */}
+          <div className="relative px-3 py-2">
             {caption && (
               <p
                 ref={captionRef}

@@ -7,19 +7,18 @@
  * and the studio's Instagram. Black and white.
  */
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 export type NavigationSection = {
   title: string;
-  /** Element id to scroll to; "top" scrolls to the start of the page. */
+  /** A page path ("/about"), a section id on the home page, or "top" for its start. */
   href: string;
   /** Extra scroll past the element's top, in viewport heights (for sections that fade in). */
   offset?: number;
   isActive?: boolean;
 };
-
-export const INTRO_DONE_EVENT = "dayfour:intro-done";
 
 function InstagramGlyph() {
   return (
@@ -35,29 +34,46 @@ export default function Header({
   navigationData,
   collaborateHref,
   instagramHref,
+  currentPage,
 }: {
   navigationData: NavigationSection[];
   collaborateHref: string;
   instagramHref: string;
+  /** Set on pages other than home: marks that page's link and sends section links home. */
+  currentPage?: string;
 }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const [active, setActive] = useState(navigationData.find((n) => n.isActive)?.href ?? navigationData[0]?.href);
+  const [active, setActive] = useState(currentPage ?? navigationData.find((n) => n.isActive)?.href ?? navigationData[0]?.href);
 
-  // Hidden during the logo intro, then fades in.
+  const scrollToSection = (item: NavigationSection, behavior: ScrollBehavior) => {
+    if (item.href === "top") return scrollTo({ top: 0, behavior });
+    const el = document.getElementById(item.href);
+    if (!el) return;
+    const y = el.getBoundingClientRect().top + scrollY + (item.offset ?? 0) * innerHeight;
+    scrollTo({ top: y, behavior });
+  };
+
+  // Arriving on home from another page with a section link (/#work): go there once the
+  // opening has settled its height.
   useEffect(() => {
-    const show = () => setVisible(true);
-    addEventListener(INTRO_DONE_EVENT, show);
-    return () => removeEventListener(INTRO_DONE_EVENT, show);
+    if (currentPage) return;
+    const id = decodeURIComponent(location.hash.slice(1));
+    const item = id && navigationData.find((n) => n.href === id);
+    if (!item) return;
+    const t = window.setTimeout(() => scrollToSection(item, "auto"), 900);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Mark the section currently in view.
   useEffect(() => {
+    if (currentPage) return;
     const onScroll = () => {
       const line = scrollY + innerHeight * 0.45;
       let current = navigationData[0]?.href;
       for (const item of navigationData) {
-        if (item.href === "top") continue;
+        if (item.href === "top" || item.href.startsWith("/")) continue;
         const el = document.getElementById(item.href);
         if (!el) continue;
         const top = el.getBoundingClientRect().top + scrollY + (item.offset ?? 0) * innerHeight;
@@ -68,30 +84,29 @@ export default function Header({
     onScroll();
     addEventListener("scroll", onScroll, { passive: true });
     return () => removeEventListener("scroll", onScroll);
-  }, [navigationData]);
+  }, [navigationData, currentPage]);
 
   const go = (item: NavigationSection) => {
     setOpen(false);
-    // Let the sheet close first, then glide to the section.
+    if (item.href === currentPage) return;
+    // Let the sheet close first, then move.
     setTimeout(() => {
-      if (item.href === "top") return scrollTo({ top: 0, behavior: "smooth" });
-      const el = document.getElementById(item.href);
-      if (!el) return;
-      const y = el.getBoundingClientRect().top + scrollY + (item.offset ?? 0) * innerHeight;
-      scrollTo({ top: y, behavior: "smooth" });
+      if (item.href.startsWith("/")) return router.push(item.href);
+      if (currentPage) return router.push(item.href === "top" ? "/" : `/#${item.href}`);
+      scrollToSection(item, "smooth");
     }, 320);
   };
 
   return (
     <header
-      className="pointer-events-none fixed inset-x-0 top-0 z-[70] flex justify-end px-4 transition-opacity duration-1000"
-      style={{ paddingTop: "calc(14px + env(safe-area-inset-top, 0px))", opacity: visible ? 1 : 0 }}
+      className="pointer-events-none fixed inset-x-0 top-0 z-[70] flex justify-end px-4"
+      style={{ paddingTop: "calc(14px + env(safe-area-inset-top, 0px))" }}
     >
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger
           aria-label="Open menu"
           className="pointer-events-auto flex size-12 items-center justify-center rounded-full border border-white/15 bg-black/40 text-white backdrop-blur-md transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white"
-          style={{ visibility: visible && !open ? "visible" : "hidden" }}
+          style={{ visibility: open ? "hidden" : "visible" }}
         >
           <Menu className="size-5" strokeWidth={1.5} />
         </SheetTrigger>
