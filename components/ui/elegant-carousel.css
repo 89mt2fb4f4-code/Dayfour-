@@ -1,0 +1,272 @@
+/* Elegant Carousel (client-work detail view). Black and white, phone first:
+   poster on top, text under it; side by side from 900px. */
+
+.carousel-wrapper {
+  position: relative;
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  gap: 28px;
+  background: #000;
+  color: #fff;
+  padding: calc(76px + env(safe-area-inset-top, 0px)) 24px calc(28px + env(safe-area-inset-bottom, 0px));
+}
+
+.carousel-close {
+  position: absolute;
+  top: calc(14px + env(safe-area-inset-top, 0px));
+  right: 16px;
+  display: flex;
+  height: 48px;
+  width: 48px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid rgb(255 255 255 / 0.15);
+  color: #fff;
+  transition: background-color 0.3s;
+}
+.carousel-close:hover {
+  background: rgb(255 255 255 / 0.1);
+}
+
+.carousel-inner {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 28px;
+}
+
+.carousel-content-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Text pieces slide and fade between projects, staggered. */
+.carousel-collection-num,
+.carousel-title,
+.carousel-subtitle,
+.carousel-description {
+  transition:
+    opacity 0.4s ease,
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.carousel-title {
+  transition-delay: 0.05s;
+}
+.carousel-subtitle {
+  transition-delay: 0.1s;
+}
+.carousel-description {
+  transition-delay: 0.15s;
+}
+.carousel-wrapper .transitioning {
+  opacity: 0;
+}
+.carousel-content .transitioning.next {
+  transform: translateX(-24px);
+}
+.carousel-content .transitioning.prev {
+  transform: translateX(24px);
+}
+.carousel-wrapper .visible {
+  opacity: 1;
+  transform: none;
+}
+
+.carousel-num-text {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: rgb(255 255 255 / 0.55);
+  font-variant-numeric: tabular-nums;
+}
+
+.carousel-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.4rem, 9vw, 4.5rem);
+  font-weight: 300;
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+}
+
+.carousel-subtitle {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.6);
+}
+
+.carousel-description {
+  max-width: 34rem;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.6;
+  color: rgb(255 255 255 / 0.75);
+}
+
+.carousel-nav-arrows {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.carousel-arrow-btn {
+  display: flex;
+  height: 46px;
+  width: 46px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid rgb(255 255 255 / 0.2);
+  color: #fff;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+}
+.carousel-arrow-btn:hover {
+  background: rgb(255 255 255 / 0.08);
+  border-color: rgb(255 255 255 / 0.4);
+}
+
+.carousel-image-container {
+  display: flex;
+  justify-content: center;
+}
+
+.carousel-image-frame {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  height: min(48svh, 520px);
+  overflow: hidden;
+  background: #0d0d0d;
+  transition:
+    opacity 0.4s ease,
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    aspect-ratio 0.5s ease,
+    height 0.5s ease,
+    width 0.5s ease;
+}
+.carousel-image-frame.transitioning {
+  transform: scale(0.96);
+}
+/* Playing: the frame opens up to the video's shape. */
+.carousel-image-frame.playing {
+  aspect-ratio: 16 / 9;
+  height: auto;
+  width: 100%;
+}
+
+.carousel-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  cursor: pointer;
+}
+.carousel-image {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.carousel-poster:hover .carousel-image {
+  transform: scale(1.03);
+}
+.carousel-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  height: 56px;
+  width: 56px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid rgb(255 255 255 / 0.35);
+  background: rgb(0 0 0 / 0.35);
+  color: #fff;
+  transform: translate(-50%, -50%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.carousel-video {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.carousel-progress-bar {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.carousel-progress-bar::-webkit-scrollbar {
+  display: none;
+}
+.carousel-progress-item {
+  display: flex;
+  min-width: 72px;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+.carousel-progress-track {
+  height: 2px;
+  width: 100%;
+  overflow: hidden;
+  background: rgb(255 255 255 / 0.15);
+}
+.carousel-progress-fill {
+  height: 100%;
+  background: #fff;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.carousel-progress-label {
+  overflow: hidden;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: rgb(255 255 255 / 0.4);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.3s;
+}
+.carousel-progress-item.active .carousel-progress-label,
+.carousel-progress-item:hover .carousel-progress-label {
+  color: #fff;
+}
+
+@media (min-width: 900px) {
+  .carousel-wrapper {
+    padding: 96px 64px 40px;
+  }
+  .carousel-inner {
+    flex-direction: row;
+    align-items: center;
+    gap: 64px;
+  }
+  .carousel-content,
+  .carousel-image-container {
+    flex: 1;
+  }
+  .carousel-image-frame {
+    height: min(64svh, 640px);
+  }
+  .carousel-image-frame.playing {
+    height: auto;
+  }
+  .carousel-description {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel-wrapper * {
+    transition-duration: 0.01ms !important;
+  }
+}

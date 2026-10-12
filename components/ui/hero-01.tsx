@@ -12,7 +12,8 @@ const navigationData: NavigationSection[] = [
   { title: "Home", href: "top", isActive: true },
   { title: "About", href: "/about" },
   { title: "What we make", href: "what-we-make", offset: 0.3 },
-  { title: "Our work", href: "work" },
+  { title: "Client work", href: "client-work" },
+  { title: "DɅYFOVR Original", href: "work" },
   { title: "Let's work", href: "contact" },
 ];
 

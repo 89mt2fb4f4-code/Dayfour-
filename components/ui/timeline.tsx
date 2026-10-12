@@ -83,7 +83,7 @@ const cls = (id: string) => id.replace(/[^a-zA-Z0-9_-]/g, "-");
 
 export default function Timeline({
   items,
-  title = "Our work",
+  title = "DɅYFOVR Original",
   periodLabel,
   lead,
   textColor = "#ffffff",

@@ -3,7 +3,7 @@
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { apiVersion, dataset, projectId } from "./sanity/env";
-import { project } from "./sanity/schema";
+import { clientProject, project } from "./sanity/schema";
 
 export default defineConfig({
   name: "dayfour",
@@ -13,5 +13,5 @@ export default defineConfig({
   dataset,
   apiVersion,
   plugins: [structureTool()],
-  schema: { types: [project] },
+  schema: { types: [clientProject, project] },
 });

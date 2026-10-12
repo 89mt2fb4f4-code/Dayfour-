@@ -16,10 +16,14 @@ Home (`app/page.tsx`):
 
 1. **Opening** (`components/site/opening.tsx`): DɅYFOVR as a Glyph Portal into the slow timeline,
    then the scroll expansion ("We don't / do normal") that scrubs the fast timeline.
-2. **What we make** (`components/site/disciplines.tsx`): fades in over the running footage.
-3. **Work** (`components/site/work.tsx`): the horizontal timeline with tap-to-play YouTube cards
-   ("Coming soon" while there are no projects).
-4. **Let's work**: the metallic button opens the studio's Instagram DM (`lib/links.ts`).
+2. **What we make** (`components/site/disciplines.tsx`): "Short. Commercial. Documentary.", fading in
+   over the running footage.
+3. **Client work** (`components/site/client-work.tsx`): the liquid glass carousel (WebGL, three.js).
+   Tapping the centred project opens the detail view (`components/ui/elegant-carousel.tsx`) with its
+   information and video. Shows temporary samples until client work is added in the admin.
+4. **DɅYFOVR Original** (`components/site/work.tsx`): the horizontal timeline with tap-to-play
+   YouTube cards ("Coming soon" while there are no projects).
+5. **Let's work**: the metallic button opens the studio's Instagram DM (`lib/links.ts`).
 
 **About** is its own page (`app/about/page.tsx`): four chapters on black, reached from the menu.
 
@@ -28,7 +32,8 @@ the expansion, then fades out. It starts on the visitor's first tap (browsers re
 
 ## Adding work
 
-Projects are added in the admin at **dayfour.studio/studio** (Sanity). Publishing there shows on
+Projects are added in the admin at **dayfour.studio/studio** (Sanity), under **Client work** or
+**DɅYFOVR Original**. Publishing there shows on
 the site within about a minute, with no rebuild. Setup: create a free project at sanity.io/manage,
 put its ID in `sanity/env.ts`, and add `https://dayfour.studio` (credentials allowed) under
 API → CORS origins.

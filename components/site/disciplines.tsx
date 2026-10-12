@@ -4,10 +4,10 @@ import { motion } from "motion/react";
 
 const FEATHER = "linear-gradient(to bottom, transparent 0, #000 30svh)";
 
-/** "Short Film. Commercial. Documentary." */
+/** "Short. Commercial. Documentary." Sits low in its frame so Client work follows right under it. */
 export default function Disciplines() {
   const lines = [
-    { text: "Short Film.", bold: false },
+    { text: "Short.", bold: false },
     { text: "Commercial.", bold: false },
     { text: "Documentary", bold: true },
   ];
@@ -17,7 +17,7 @@ export default function Disciplines() {
     <section
       id="what-we-make"
       aria-label="What we make"
-      className="relative -mt-[30svh] flex h-[100svh] items-center justify-center overflow-hidden bg-black px-6"
+      className="relative -mt-[30svh] flex h-[78svh] items-end justify-center overflow-hidden bg-black px-6 pb-6"
       style={{ maskImage: FEATHER, WebkitMaskImage: FEATHER }}
     >
       <motion.div

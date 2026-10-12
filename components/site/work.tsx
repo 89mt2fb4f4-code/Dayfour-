@@ -11,9 +11,9 @@ import { youtubeId } from "@/lib/youtube";
 function ComingSoon() {
   const hud = "font-hud text-[9px] font-medium uppercase leading-[1.35] tracking-[0.08em] text-white/55";
   return (
-    <section id="work" aria-label="Our work, coming soon" className="relative flex h-[100svh] items-center justify-center overflow-hidden bg-black">
+    <section id="work" aria-label="DɅYFOVR Original, coming soon" className="relative flex h-[100svh] items-center justify-center overflow-hidden bg-black">
       <p className="absolute left-6 top-[calc(24px+env(safe-area-inset-top,0px))] font-serif text-xl font-light tracking-[0.08em] text-white/80">
-        Our work
+        DɅYFOVR Original
       </p>
 
       <div className="relative" style={{ perspective: "900px" }}>
@@ -89,7 +89,7 @@ export default function Work() {
   if (!projects.length) return <ComingSoon />;
   return (
     <Timeline
-      title="Our work"
+      title="DɅYFOVR Original"
       lead={
         <div className="flex h-full w-full items-end bg-df-grey-dim p-6">
           <p className="font-serif text-2xl font-light italic text-white/80">The work is the argument.</p>
