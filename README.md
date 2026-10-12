@@ -52,4 +52,4 @@ Projects can also live in code in `content/work.ts`; they show after the admin's
 ## Deploy
 
 Hosted on Vercel (project `my-dayfour`), connected to this repo. The production branch is
-`claude/21st-server-check-klhree`: every push to it goes live at dayfour.studio.
+`claude/21st-server-check-klhree`: every push to it goes live at www.dayfour.studio (dayfour.studio redirects there).
